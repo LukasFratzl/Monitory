@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DataTranslate_Mc_Lf.h"
+#include "MediaSource.h"
 #include "SplineWidget.h"
 #include "WidgetHardwareLabel_Mc_Lf.h"
 #include "Blueprint/UserWidget.h"
@@ -102,6 +103,18 @@ enum EPrecisionPoint : uint8
 	Zero,
 	One,
 	Two
+};
+
+USTRUCT(BlueprintType)
+struct MONITORY_CLIENT_API FTheme_Mc_Lf
+{
+	GENERATED_BODY()
+
+	FTheme_Mc_Lf(){}
+	~FTheme_Mc_Lf(){}
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<UMediaSource> Background = nullptr;
 };
 
 
@@ -282,6 +295,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UEditableTextBox> IPAddressAddTextBox;
 
+	UPROPERTY(EditAnywhere)
+	TArray<FTheme_Mc_Lf> CachedThemes;
+
 	UFUNCTION(BlueprintCallable)
 	void OnAddIPButtonPressed();
 	
@@ -302,6 +318,9 @@ public:
 	void CacheTextBoxes(UEditableTextBox* IpAddressAdd);
 
 	UFUNCTION(BlueprintCallable)
+	void CacheThemes(TArray<FTheme_Mc_Lf> Themes);
+
+	UFUNCTION(BlueprintCallable)
 	void TickComponent(float DeltaTime);
 
 
@@ -319,4 +338,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void FitBackgroundImageToScreen(UScaleBox* BgImage, const FVector2D TextureSize);
+
+	UFUNCTION(BlueprintCallable)
+	FTheme_Mc_Lf LoadTheme(float& Blur, float& Blackness);
+	
+	UFUNCTION(BlueprintCallable)
+	void ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount);
 };

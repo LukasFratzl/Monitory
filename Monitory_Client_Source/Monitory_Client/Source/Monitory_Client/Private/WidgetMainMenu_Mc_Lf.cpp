@@ -151,6 +151,11 @@ void UWidgetMainMenu_Mc_Lf::CacheTextBoxes(UEditableTextBox* IpAddressAdd)
 	IPAddressAddTextBox = IpAddressAdd;
 }
 
+void UWidgetMainMenu_Mc_Lf::CacheThemes(TArray<FTheme_Mc_Lf> Themes)
+{
+	CachedThemes = Themes;
+}
+
 void UWidgetMainMenu_Mc_Lf::TickComponent(float DeltaTime)
 {
 	//LastUpdateRateSeconds = UpdateRateSeconds;
@@ -229,7 +234,7 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	{
 		return;
 	}
-	
+
 	// CPU -> Start
 	AdvanceGraph(CpuUtilizationGraph, ADataTranslate_Mc_Lf::PcData.CpuLoadThreads, false, CpuUtilizationCanvasPanel);
 
@@ -431,7 +436,7 @@ void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMi
 						LabelPadding.Bottom = 5;
 						LabelSlot->SetPadding(LabelPadding);
 					}
-				}	
+				}
 			}
 
 			if (IsValid(Line.Label->LabelText))
@@ -649,5 +654,52 @@ void UWidgetMainMenu_Mc_Lf::FitBackgroundImageToScreen(UScaleBox* BgImage, const
 		{
 			ImageSlot->SetSize(NewSize);
 		}
+	}
+}
+
+FTheme_Mc_Lf UWidgetMainMenu_Mc_Lf::LoadTheme(float& Blur, float& Blackness)
+{
+	const FString Data = ADataTranslate_Mc_Lf::ReadDataFromInternalStorage(ADataTranslate_Mc_Lf::ThemeSettingsFileName);
+
+	Blur = 1;
+	Blackness = 0.25f;
+
+	if (Data.IsEmpty())
+	{
+		constexpr int32 FallbackIndex = 1;
+		if (CachedThemes.IsValidIndex(FallbackIndex))
+		{
+			return CachedThemes[FallbackIndex];
+		}
+		return FTheme_Mc_Lf();
+	}
+
+	TArray<FString> DataArray;
+	Data.ParseIntoArray(DataArray, TEXT("|"), false);
+
+	const int32& Index = FCString::Atoi(*DataArray[0]);
+	if (DataArray.IsValidIndex(1) && DataArray.IsValidIndex(2))
+	{
+		Blur = FCString::Atof(*DataArray[1]);
+		Blackness = FCString::Atof(*DataArray[2]);	
+	}
+
+	if (CachedThemes.IsValidIndex(Index))
+	{
+		return CachedThemes[Index];
+	}
+	return FTheme_Mc_Lf();
+}
+
+void UWidgetMainMenu_Mc_Lf::ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount)
+{
+	if (const int32& Index = CachedThemes.FindLastByPredicate([&Theme](const FTheme_Mc_Lf& Other) { return Other.Background == Theme.Background; }); Index != INDEX_NONE)
+	{
+		FString Data = FString::Printf(TEXT("%s|"), *FString::FormatAsNumber(Index));
+		Data += FString::Printf(TEXT("%f|"), BlurStrength);
+		Data += FString::Printf(TEXT("%f|"), BlacknessAmount);
+		
+		// Add more settings -> It's currently without separator
+		ADataTranslate_Mc_Lf::SaveDataToInternalStorage(Data, ADataTranslate_Mc_Lf::ThemeSettingsFileName);
 	}
 }

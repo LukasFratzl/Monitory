@@ -154,6 +154,7 @@ public:
 	inline static FPCData_Mc_Lf PcData;
 
 	inline static const FString IPAddressesFileName = FString("WhiteListedIPAddresses.txt");
+	inline static const FString ThemeSettingsFileName = FString("ThemeSettings.txt");
 	
 	inline static TArray<FString> IPAddresses;
 	inline static bool bChangedIPAddresses = false;

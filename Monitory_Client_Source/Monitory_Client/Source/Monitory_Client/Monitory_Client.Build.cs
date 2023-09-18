@@ -19,7 +19,7 @@ public class Monitory_Client : ModuleRules
 			"SlateCore",
 			"Sockets",
 			"Networking",
-			"HTTP"
+			"HTTP", "MediaAssets"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
