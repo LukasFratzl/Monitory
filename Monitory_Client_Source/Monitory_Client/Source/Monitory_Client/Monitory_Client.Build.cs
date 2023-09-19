@@ -29,7 +29,7 @@ public class Monitory_Client : ModuleRules
 			"Engine",
 			"Sockets",
 			"Networking",
-			"HTTP"
+			"HTTP",
 		});
 
 		// Uncomment if you are using Slate UI

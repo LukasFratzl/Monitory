@@ -115,6 +115,9 @@ struct MONITORY_CLIENT_API FTheme_Mc_Lf
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TObjectPtr<UMediaSource> Background = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TObjectPtr<UTexture2D> BackgroundFallback = nullptr;
 };
 
 
@@ -340,8 +343,8 @@ public:
 	void FitBackgroundImageToScreen(UScaleBox* BgImage, const FVector2D TextureSize);
 
 	UFUNCTION(BlueprintCallable)
-	FTheme_Mc_Lf LoadTheme(float& Blur, float& Blackness);
+	FTheme_Mc_Lf LoadTheme(float& Blur, float& Blackness, bool& bAnimations);
 	
 	UFUNCTION(BlueprintCallable)
-	void ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount);
+	void ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount, bool bAnimated);
 };

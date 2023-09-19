@@ -20,9 +20,8 @@ void ASettings_Mc_Lf::BeginPlay()
 
 #if PLATFORM_DESKTOP
 	Set3DWorldEnabled(false);
-	
-	SetShowMouseEnabled(true);
 #endif
+	SetShowMouseEnabled(true);
 }
 
 // Called every frame

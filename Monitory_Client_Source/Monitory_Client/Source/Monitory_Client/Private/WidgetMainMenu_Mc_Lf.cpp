@@ -4,6 +4,7 @@
 #include "Monitory_Client/Public/WidgetMainMenu_Mc_Lf.h"
 
 #include "DataTranslate_Mc_Lf.h"
+//#include "OpenGLDrv.h"
 #include "TcpClient_Mc_Lf.h"
 #include "WidgetIPAddress_Mc_Lf.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
@@ -657,12 +658,13 @@ void UWidgetMainMenu_Mc_Lf::FitBackgroundImageToScreen(UScaleBox* BgImage, const
 	}
 }
 
-FTheme_Mc_Lf UWidgetMainMenu_Mc_Lf::LoadTheme(float& Blur, float& Blackness)
+FTheme_Mc_Lf UWidgetMainMenu_Mc_Lf::LoadTheme(float& Blur, float& Blackness, bool& bAnimations)
 {
 	const FString Data = ADataTranslate_Mc_Lf::ReadDataFromInternalStorage(ADataTranslate_Mc_Lf::ThemeSettingsFileName);
 
 	Blur = 1;
 	Blackness = 0.25f;
+	bAnimations = false;
 
 	if (Data.IsEmpty())
 	{
@@ -678,10 +680,11 @@ FTheme_Mc_Lf UWidgetMainMenu_Mc_Lf::LoadTheme(float& Blur, float& Blackness)
 	Data.ParseIntoArray(DataArray, TEXT("|"), false);
 
 	const int32& Index = FCString::Atoi(*DataArray[0]);
-	if (DataArray.IsValidIndex(1) && DataArray.IsValidIndex(2))
+	if (DataArray.IsValidIndex(1) && DataArray.IsValidIndex(2) && DataArray.IsValidIndex(3))
 	{
 		Blur = FCString::Atof(*DataArray[1]);
-		Blackness = FCString::Atof(*DataArray[2]);	
+		Blackness = FCString::Atof(*DataArray[2]);
+		bAnimations = (bool)FCString::Atoi(*DataArray[3]);
 	}
 
 	if (CachedThemes.IsValidIndex(Index))
@@ -691,13 +694,14 @@ FTheme_Mc_Lf UWidgetMainMenu_Mc_Lf::LoadTheme(float& Blur, float& Blackness)
 	return FTheme_Mc_Lf();
 }
 
-void UWidgetMainMenu_Mc_Lf::ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount)
+void UWidgetMainMenu_Mc_Lf::ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount, bool bAnimated)
 {
 	if (const int32& Index = CachedThemes.FindLastByPredicate([&Theme](const FTheme_Mc_Lf& Other) { return Other.Background == Theme.Background; }); Index != INDEX_NONE)
 	{
 		FString Data = FString::Printf(TEXT("%s|"), *FString::FormatAsNumber(Index));
 		Data += FString::Printf(TEXT("%f|"), BlurStrength);
 		Data += FString::Printf(TEXT("%f|"), BlacknessAmount);
+		Data += FString::Printf(TEXT("%d|"), (int32)bAnimated);
 		
 		// Add more settings -> It's currently without separator
 		ADataTranslate_Mc_Lf::SaveDataToInternalStorage(Data, ADataTranslate_Mc_Lf::ThemeSettingsFileName);
