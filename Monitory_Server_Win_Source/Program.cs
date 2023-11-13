@@ -201,8 +201,15 @@ namespace HW_Imp
 				{
 					foreach (ISensor sensor in subhardware.Sensors)
 					{
-						CollectPowerData(sensor, hardware.Name, ref watts);
-						CollectTemperatureData(sensor, hardware.Name, ref temps);
+						if (hardware.HardwareType == HardwareType.Cpu ||
+						    hardware.HardwareType == HardwareType.GpuNvidia ||
+						    hardware.HardwareType == HardwareType.GpuIntel ||
+							hardware.HardwareType == HardwareType.GpuAmd)
+						{
+							CollectPowerData(sensor, hardware.Name, ref watts);
+							CollectTemperatureData(sensor, hardware.Name, ref temps);
+						}
+
 						if (hardware.HardwareType == HardwareType.Cpu)
 						{
 							CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref clockSpeedTotal, ref properties);
@@ -222,8 +229,14 @@ namespace HW_Imp
 
 				foreach (ISensor sensor in hardware.Sensors)
 				{
-					CollectPowerData(sensor, hardware.Name, ref watts);
-					CollectTemperatureData(sensor, hardware.Name, ref temps);
+					if (hardware.HardwareType == HardwareType.Cpu ||
+					    hardware.HardwareType == HardwareType.GpuNvidia ||
+					    hardware.HardwareType == HardwareType.GpuIntel ||
+					    hardware.HardwareType == HardwareType.GpuAmd)
+					{
+						CollectPowerData(sensor, hardware.Name, ref watts);
+						CollectTemperatureData(sensor, hardware.Name, ref temps);
+					}
 					if (hardware.HardwareType == HardwareType.Cpu)
 					{
 						CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref clockSpeedTotal, ref properties);
@@ -556,53 +569,3 @@ namespace HW_Imp
 
 	}
 }
-
-
-// We need....
-// CPU
-// - Utilization -> Average | Thread -> [ ] | 1
-// - Current | Min |  Clock Speed -> [ ] | 2
-// - Info -> Name -> [ ]
-// RAM -> Merged into CPU
-// - Current | Min | Max Memory -> [ ] | 3
-
-// Fan -> 1 Graph | Dynamic Graph | 4
-// - CPU Fan Speed -> [ ]
-// - GPU Fan Speed -> [ ]
-// - Other Fan Speed -> [ ]
-
-// Wattage -> 1 Graph | Dynamic Graph | 5
-// - CPU Wattage -> [ ]
-// - GPU Wattage -> [ ]
-// - Other Wattage -> [ ]
-
-// Temps -> 1 Graph | Dynamic Graph | 6
-// - CPU Temps -> [ ]
-// - GPU Temps -> [ ]
-// - Other Temps -> [ ]
-
-// GPU
-// - Utilization -> Average -> [ ] | 7
-// - Current | Min | Max Clock Speed -> [ ] | 8
-// - Current | Min | Max Memory -> [ ] | 9
-// - Info -> Name -> [ ]
-
-// Num Graphs -> 9
-
-// 2x5
-// 1080 pixel / 5 -> 216 pixel Per Graph Height
-// 1920 pixel / 2 -> 960 pixel Per Graph Lenght
-
-// 3x3
-// 1080 pixel / 3 -> 360 pixel Per Graph Height
-// 1920 pixel / 3 -> 640 pixel Per Graph Lenght
-
-// Most Important
-// - CPU Utility
-// - RAM Usage
-// - GPU Utility
-// - GPU DRAM Usage
-// - Wattage
-// - Temps
-
-// Num Important Graphs -> 6

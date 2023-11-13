@@ -1,0 +1,15 @@
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/Monitory_Server_Linux
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/Monitory_Server_Linux.deps.json
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/Monitory_Server_Linux.runtimeconfig.json
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/Monitory_Server_Linux.dll
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/ref/Monitory_Server_Linux.dll
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/bin/Debug/net6.0/Monitory_Server_Linux.pdb
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.csproj.AssemblyReference.cache
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.GeneratedMSBuildEditorConfig.editorconfig
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.AssemblyInfoInputs.cache
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.AssemblyInfo.cs
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.csproj.CoreCompileInputs.cache
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.dll
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/ref/Monitory_Server_Linux.dll
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.pdb
+/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/Debug/net6.0/Monitory_Server_Linux.genruntimeconfig.cache
