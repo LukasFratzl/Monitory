@@ -6,12 +6,12 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "Monitory_Server/1.0.0": {
+      "Monitory_Server_Windows/1.0.0": {
         "dependencies": {
           "LibreHardwareMonitorLib": "0.9.2"
         },
         "runtime": {
-          "Monitory_Server.dll": {}
+          "Monitory_Server_Windows.dll": {}
         }
       },
       "HidSharp/2.1.0": {
@@ -269,7 +269,7 @@
     }
   },
   "libraries": {
-    "Monitory_Server/1.0.0": {
+    "Monitory_Server_Windows/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

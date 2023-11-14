@@ -1,31 +1,27 @@
-﻿using System; // Importing the System namespace
+﻿using System.Net;
 using System.Net.Sockets;
-using System.Net;
 using System.Numerics;
 using System.Text;
-using System.Threading;
-using LibreHardwareMonitor;
 using LibreHardwareMonitor.Hardware;
-using LibreHardwareMonitor.Hardware.Cpu;
 
-namespace HW_Imp
+namespace Monitory_Server_Windows
 {
 	class Program
 	{
-		const string TotalName = "total";
-		const string CoreName = "core";
-		const string ThreadName = "thread";
-		const string UsedName = "used";
-		const string AvailableName = "available";
-		const string FreeName = "free";
-		const string VirtualName = "virtual";
-		const string TjName = "tj";
-		const string DownloadName = "down";
-		const string UploadName = "up";
+		private const string TotalName = "total";
+		private const string CoreName = "core";
+		private const string ThreadName = "thread";
+		private const string UsedName = "used";
+		private const string AvailableName = "available";
+		private const string FreeName = "free";
+		private const string VirtualName = "virtual";
+		private const string TjName = "tj";
+		private const string DownloadName = "down";
+		private const string UploadName = "up";
 
-		static string DataToSend = "";
+		static string _dataToSend = "";
 
-		public class UpdateVisitor : IVisitor
+		private class UpdateVisitor : IVisitor
 		{
 			public void VisitComputer(IComputer computer)
 			{
@@ -40,17 +36,17 @@ namespace HW_Imp
 			public void VisitParameter(IParameter parameter) { }
 		}
 
-		static Computer computer = new Computer();
+		private static Computer _computer = new Computer();
 
-		TcpListener server = new TcpListener(IPAddress.Any, 54000);
+		private readonly TcpListener _server = new TcpListener(IPAddress.Any, 54000);
 
-		static void Main()
+		private static void Main()
 		{
 
 			Console.WriteLine("Thanks a lot for coming that far...");
 			Console.WriteLine("Make sure to run the app as admin, otherwise some monitor fetures are not available...");
 
-			computer = new Computer
+			_computer = new Computer
 			{
 				IsCpuEnabled = true,
 				IsGpuEnabled = true,
@@ -61,10 +57,10 @@ namespace HW_Imp
 				IsStorageEnabled = true
 			};
 
-			computer.Open();
-			computer.Accept(new UpdateVisitor());
+			_computer.Open();
+			_computer.Accept(new UpdateVisitor());
 
-			foreach (IHardware hardware in computer.Hardware)
+			foreach (IHardware hardware in _computer.Hardware)
 			{
 				Console.WriteLine("Hardware Type: {0}", hardware.HardwareType);
 				Console.WriteLine("Hardware: {0}", hardware.Name);
@@ -86,43 +82,14 @@ namespace HW_Imp
 				}
 			}
 
-			// Define the file path on the desktop
-			//string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-			//string filePath = Path.Combine(desktopPath, "sensor_data.txt");
-
 			bool bNeedExit = false;
-			//while (!bNeedExit) {
-
-			//	string Data = CollectData();
-
-			//	try
-			//	{
-			//		// Create or overwrite the file
-			//		using (StreamWriter writer = File.CreateText(filePath))
-			//		{
-			//			writer.WriteLine(Data);
-			//		}
-			//	} catch(Exception) { 
-			//	}
-			//}
-
-			//TcpListener server = new TcpListener(IPAddress.Any, 54000);
-
-			//server.Start();
-
-			//List<NetworkClient> clients = new List<NetworkClient>();
-
-			//while (!bNeedExit)
-			//{
-
-			//}
 
 			Program main = new Program();
 			main.server_start();  //starting the server
 
 			while (!bNeedExit)
 			{
-				DataToSend = CollectData();
+				_dataToSend = CollectData();
 				Thread.Sleep(300);
 			}
 
@@ -133,24 +100,24 @@ namespace HW_Imp
 
 			Console.WriteLine("Exiting the program.");
 
-			computer.Close();
+			_computer.Close();
 		}
 
 		private void server_start()
 		{
-			server.Start();
+			_server.Start();
 			accept_connection();  //accepts incoming connections
 		}
 
 		private void accept_connection()
 		{
-			server.BeginAcceptTcpClient(handle_connection, server);  //this is called asynchronously and will run in a different thread
+			_server.BeginAcceptTcpClient(handle_connection, _server);  //this is called asynchronously and will run in a different thread
 		}
 
 		private void handle_connection(IAsyncResult result)  //the parameter is a delegate, used to communicate between threads
 		{
 			accept_connection();  //once again, checking for any other incoming connections
-			TcpClient client = server.EndAcceptTcpClient(result);  //creates the TcpClient
+			TcpClient client = _server.EndAcceptTcpClient(result);  //creates the TcpClient
 
 			NetworkStream ns = client.GetStream();
 
@@ -162,7 +129,7 @@ namespace HW_Imp
 			{
 				while (client.Connected)  //while the client is connected, we look for incoming messages
 				{
-					string hiMessage = DataToSend;
+					string hiMessage = _dataToSend;
 					byte[] hiBytes = Encoding.Default.GetBytes(hiMessage);
 					ns.Write(hiBytes, 0, hiBytes.Length);
 
@@ -193,21 +160,21 @@ namespace HW_Imp
 			Dictionary<string, Vector3> uploadSpeeds = new Dictionary<string, Vector3>();
 
 			string properties = "";
-			computer.Accept(new UpdateVisitor());
+			_computer.Accept(new UpdateVisitor());
 
-			foreach (IHardware hardware in computer.Hardware)
+			foreach (IHardware hardware in _computer.Hardware)
 			{
 				foreach (IHardware subhardware in hardware.SubHardware)
 				{
 					foreach (ISensor sensor in subhardware.Sensors)
 					{
-						if (hardware.HardwareType == HardwareType.Cpu ||
-						    hardware.HardwareType == HardwareType.GpuNvidia ||
-						    hardware.HardwareType == HardwareType.GpuIntel ||
-							hardware.HardwareType == HardwareType.GpuAmd)
+						if (subhardware.HardwareType == HardwareType.Cpu ||
+						    subhardware.HardwareType == HardwareType.GpuNvidia ||
+						    subhardware.HardwareType == HardwareType.GpuIntel ||
+						    subhardware.HardwareType == HardwareType.GpuAmd)
 						{
-							CollectPowerData(sensor, hardware.Name, ref watts);
-							CollectTemperatureData(sensor, hardware.Name, ref temps);
+							CollectPowerData(sensor, subhardware.Name, ref watts);
+							CollectTemperatureData(sensor, subhardware.Name, ref temps);
 						}
 
 						if (hardware.HardwareType == HardwareType.Cpu)
@@ -255,8 +222,8 @@ namespace HW_Imp
 			}
 
 			// Capture and write the total CPU load to the file
-			string CpuClockTotal = $"Cpu_Clock:Total:{clockSpeedTotal.X}:{clockSpeedTotal.Y}:{clockSpeedTotal.Z}|";
-			properties += CpuClockTotal;
+			string cpuClockTotal = $"Cpu_Clock:Total:{clockSpeedTotal.X}:{clockSpeedTotal.Y}:{clockSpeedTotal.Z}|";
+			properties += cpuClockTotal;
 
 			foreach (var powerValue in watts) {
 				string power = $"Wattage:{powerValue.Key}:{powerValue.Value.X}:{powerValue.Value.Y}:{powerValue.Value.Z}|";
@@ -269,11 +236,11 @@ namespace HW_Imp
 				properties += temp;
 			}
 
-			string TimeNow = $"Time_Now:{DateTime.Now.ToString("HH~mm")}:0:0:0|";
-			properties += TimeNow;
+			string timeNow = $"Time_Now:{DateTime.Now.ToString("HH~mm")}:0:0:0|";
+			properties += timeNow;
 
-			string DateNow = $"Date_Now:{DateTime.Now.ToShortDateString()}:0:0:0|";
-			properties += DateNow;
+			string dateNow = $"Date_Now:{DateTime.Now.ToShortDateString()}:0:0:0|";
+			properties += dateNow;
 
 			foreach (var downValue in downloadSpeeds)
 			{
@@ -294,14 +261,11 @@ namespace HW_Imp
 		{
 			if (sensor.SensorType == SensorType.Power)
 			{
-				if (!watts.ContainsKey(hardwareName))
-				{
-					watts.Add(hardwareName, new Vector3());
-				}
+				watts.TryAdd(hardwareName, new Vector3());
 
 				Vector3 power = watts[hardwareName];
 
-				power.X += sensor.Value.GetValueOrDefault();
+				power.X = MathF.Max(power.X, sensor.Value.GetValueOrDefault());
 
 				if (power.Y <= 0)
 				{
@@ -443,10 +407,7 @@ namespace HW_Imp
 			string sensorName = sensor.Name.ToLower();
 			if (sensor.SensorType == SensorType.Temperature && !sensorName.Contains(TjName))
 			{
-				if (!temps.ContainsKey(hardwareName))
-				{
-					temps.Add(hardwareName, new Vector3());
-				}
+				temps.TryAdd(hardwareName, new Vector3());
 
 				Vector3 temp = temps[hardwareName];
 
@@ -497,10 +458,7 @@ namespace HW_Imp
 			{
 				if (sensorName.Contains(DownloadName))
 				{
-					if (!down.ContainsKey(hardwareName))
-					{
-						down.Add(hardwareName, new Vector3());
-					}
+					down.TryAdd(hardwareName, new Vector3());
 
 					Vector3 value = down[hardwareName];
 
@@ -532,10 +490,7 @@ namespace HW_Imp
 
 				if (sensorName.Contains(UploadName))
 				{
-					if (!up.ContainsKey(hardwareName))
-					{
-						up.Add(hardwareName, new Vector3());
-					}
+					up.TryAdd(hardwareName, new Vector3());
 
 					Vector3 value = up[hardwareName];
 

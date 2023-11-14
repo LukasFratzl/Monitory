@@ -1,1 +1,25 @@
 # Monitory
+
+*_Monitory is a Cross-Platform Monitoring App which allows to Monitor a Linux or Windows Device through a Android Phone or Tablet_*
+
+## How To Use:
+### Server:
+*_Monitory Server Apps are available for Windows and Linux, this apps reading the hardware and sending it via TCP to the Clients_*
+#### Windows:
+ - Navigate to the Releases and download a Windows Server version
+ - It's good practice to Run the App as Admin
+ - When you like the app and want keep it running every Windows Start, create an automated Task <https://www.windowscentral.com/how-create-automated-tasks-windows-11>
+
+ #### Linux:
+ - Navigate to the Releases and download a Linux Server version
+ - Make sure you have `mpstat` `iostat` `ifstat` `cat` `nvidia-smi` installed
+ - Only NVIDIA GPUs are supported for Linux
+ - Run it and when you like it add it as start up application
+
+### Client:
+*_Monitory Client Apps are available for Android, this apps reading the TCP Data sended from the Monitory Server App to display the Wardware Infos on this Client Device_*
+#### Andorid:
+ - Navigate to the Releases and download a Andoid Client version
+ - Install it on your Android Device, it needs to be 64 Bit, Android 8 or Higher, ES3.1 or Higher
+ - Run it and Play with the customization settings
+ - White List the Server IP, you can have multiple Servers and it should connect with the Server
