@@ -1,13 +1,7 @@
-﻿//using System; // Importing the System namespace
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-
-//using System.Numerics;
-
-//using System.Threading;
 
 namespace Monitory_Server_Linux
 {
@@ -158,7 +152,7 @@ namespace Monitory_Server_Linux
 
         static string RunCommand(string command, string arguments)
         {
-            string output = "";
+            string output;
 
             try
             {
@@ -198,6 +192,11 @@ namespace Monitory_Server_Linux
 
             if (_lastCpuUtilString == "")
             {
+                string line = $"Cpu_Utility:Total:0:0:100|";
+                properties += line;
+
+                string line1 = $"Cpu_Utility:0:0:0:100|";
+                properties += line1;
                 return;
             }
 
@@ -208,11 +207,14 @@ namespace Monitory_Server_Linux
 
             if (splittedUtilityString.Length > 2)
             {
+                
                 string[] allCpuRow = splittedUtilityString[2].Split(' ', StringSplitOptions.RemoveEmptyEntries)
                     ;
-                //Console.WriteLine(allUltilitystrings[allUltilitystrings.Length - 1]);
+                //string utilityValue = allCpuRow[allCpuRow.Length - 1].Replace(',', '.');
+                float parseValue = 0;
+                float.TryParse(allCpuRow[allCpuRow.Length - 1].Replace(',', '.'), out parseValue);
 
-                float allUtility = 100f - float.Parse(allCpuRow[allCpuRow.Length - 1].Replace(',', '.'));
+                float allUtility = 100f - parseValue;
 
                 string line = $"Cpu_Utility:Total:{allUtility}:0:100|";
                 properties += line;
@@ -233,8 +235,10 @@ namespace Monitory_Server_Linux
                 }
 
                 // Console.WriteLine(ultilitystrings[ultilitystrings.Length - 1]);
+                float parseValue = 0;
+                float.TryParse(cpuRow[cpuRow.Length - 1].Replace(',', '.'), out parseValue);
 
-                float utility = 100f - float.Parse(cpuRow[cpuRow.Length - 1].Replace(',', '.'));
+                float utility = 100f - parseValue;
 
                 string line = $"Cpu_Utility:{threadIndex}:{utility}:0:100|";
                 properties += line;
@@ -253,7 +257,8 @@ namespace Monitory_Server_Linux
             float averageMhz = -1f;
             foreach (var mhz in splittedMhzString)
             {
-                float mhzFloat = float.Parse(mhz.Replace(',', '.'));
+                float mhzFloat = 0;
+                float.TryParse(mhz.Replace(',', '.'), out mhzFloat);
 
                 string line = $"Cpu_Clock:{mhzThreadIdx}:{mhzFloat}:0:100|";
                 properties += line;
@@ -283,14 +288,13 @@ namespace Monitory_Server_Linux
             float ramFloatAvailableFull = 0;
             if (splittedRamString.Length >= 1)
             {
-                ramFloatAvailableFull = float.Parse(splittedRamString[0].Replace(',', '.'));
+                float.TryParse(splittedRamString[0].Replace(',', '.'), out ramFloatAvailableFull);
             }
 
             float ramFloatUsed = 0;
             if (splittedRamString.Length >= 2)
             {
-                //Console.WriteLine(splittedRamString[1]);
-                ramFloatUsed = float.Parse(splittedRamString[1].Replace(',', '.'));
+                float.TryParse(splittedRamString[1].Replace(',', '.'), out ramFloatUsed);
                 string line = $"Cpu_Memory:Used:{ramFloatUsed}:0:100|";
                 properties += line;
             }
@@ -338,7 +342,8 @@ namespace Monitory_Server_Linux
                     continue;
                 }
 
-                float drivesFloat = float.Parse(driveRow[driveRow.Length - 1].Replace(',', '.'));
+                float drivesFloat = 0;
+                float.TryParse(driveRow[driveRow.Length - 1].Replace(',', '.'), out drivesFloat);
 
                 string storage = $"Storage_Load:{driveRow[0]}:{drivesFloat}:0:100|";
                 properties += storage;
@@ -362,6 +367,8 @@ namespace Monitory_Server_Linux
             string[] splittedNetworkString = _lastNetworkUtilString.Split(new[] { Environment.NewLine },
                 StringSplitOptions.RemoveEmptyEntries);
 
+            if (splittedNetworkString.Length <= 2) return;
+            
             string[] networkRow = splittedNetworkString[2]
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -369,8 +376,12 @@ namespace Monitory_Server_Linux
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
             int iterationIdx = 1;
-            float maxDownload = float.Parse(networkRow[networkRow.Length - 1].Replace(',', '.')) * 1024;
-            float maxUpload = float.Parse(networkRow[networkRow.Length - 2].Replace(',', '.')) * 1024;
+            float maxDownload = 0;
+            float.TryParse(networkRow[networkRow.Length - 1].Replace(',', '.'), out maxDownload);
+            maxDownload *= 1024;
+            float maxUpload = 0;
+            float.TryParse(networkRow[networkRow.Length - 2].Replace(',', '.'), out maxUpload);
+            maxUpload *= 1024;
             while (networkRow.Length > iterationIdx + 2)
             {
                 int nameIdx = (iterationIdx - 1) / 2 + 1;
@@ -378,13 +389,17 @@ namespace Monitory_Server_Linux
                 // Console.WriteLine(nameIdx);
                 //  Console.WriteLine(iterationIdx);
 
-                float upFloat = float.Parse(networkRow[iterationIdx + 1].Replace(',', '.')) * 1024;
+                float upFloat = 0;
+                float.TryParse(networkRow[iterationIdx + 1].Replace(',', '.'), out upFloat);
+                upFloat *= 1024;
 
                 string upload =
                     $"Upload_Speed:{networkRowNames[nameIdx]}:{upFloat}:0:{maxUpload}|";
                 properties += upload;
 
-                float downFloat = float.Parse(networkRow[iterationIdx].Replace(',', '.')) * 1024;
+                float downFloat = 0;
+                float.TryParse(networkRow[iterationIdx].Replace(',', '.'), out downFloat);
+                downFloat *= 1024;
 
                 string download =
                     $"Download_Speed:{networkRowNames[nameIdx]}:{downFloat}:0:{maxDownload}|";
@@ -428,12 +443,32 @@ namespace Monitory_Server_Linux
             string temp = RunCommand("bash", "-c \"nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader\"");
             string watt = RunCommand("bash", "-c \"nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits\"");
 
-            properties += $"Gpu_Utility:Clock:{float.Parse(utility.Replace(',', '.'))}:0:100|";
-            properties += $"Gpu_Clock:Clock:{float.Parse(clock.Replace(',', '.'))}:0:100|";
-            properties += $"Gpu_Memory:Available:{float.Parse(freeMem.Replace(',', '.')) / 1000}:0:100|";
-            properties += $"Gpu_Memory:Used:{float.Parse(usedMem.Replace(',', '.')) / 1000}:0:100|";
-            properties += $"Wattage:{name}:{float.Parse(watt.Replace(',', '.'))}:0:100|";
-            properties += $"Temperature:{name}:{float.Parse(temp.Replace(',', '.'))}:0:100|";
+            float gpuUtil = 0;
+            float.TryParse(utility.Replace(',', '.'), out gpuUtil);
+
+            float gpuClock = 0;
+            float.TryParse(clock.Replace(',', '.'), out gpuClock);
+
+            float gpuMemAvailable = 0;
+            float.TryParse(freeMem.Replace(',', '.'), out gpuMemAvailable);
+            gpuMemAvailable /= 1000;
+
+            float gpuMemUsed = 0;
+            float.TryParse(usedMem.Replace(',', '.'), out gpuMemUsed);
+            gpuMemUsed /= 1000;
+
+            float gpuWatt = 0;
+            float.TryParse(watt.Replace(',', '.'), out gpuWatt);
+
+            float gpuTemp = 0;
+            float.TryParse(temp.Replace(',', '.'), out gpuTemp);
+            
+            properties += $"Gpu_Utility:Clock:{gpuUtil}:0:100|";
+            properties += $"Gpu_Clock:Clock:{gpuClock}:0:100|";
+            properties += $"Gpu_Memory:Available:{gpuMemAvailable}:0:100|";
+            properties += $"Gpu_Memory:Used:{gpuMemUsed}:0:100|";
+            properties += $"Wattage:{name}:{gpuWatt}:0:100|";
+            properties += $"Temperature:{name}:{gpuTemp}:0:100|";
         }
     }
 }

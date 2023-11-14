@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "j8g+0cz+EGccp/MT/eJXo8mrgb0kPFL7IIohf4tSMIrPhZkgCOgpi0uqfB7Q3j6Fzg97MLRyobykNmPY+kqq1g==",
+  "dgSpecHash": "dS0aw0SMv5YdbJd5fn6XTHkr5nig9j5x8eGrb4uqeI/HrFip5k9Cj2oelxPGI4MICg85yJ8/DUsUunUutikDrw==",
   "success": true,
-  "projectFilePath": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
+  "projectFilePath": "C:\\Users\\lukas\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\Monitory_Server_Linux.csproj",
   "expectedPackageFiles": [],
   "logs": []
 }
