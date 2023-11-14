@@ -408,38 +408,40 @@ void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMi
 		return;
 	}
 
-	bool bOneNotValid = false;
-	for (const FShapedLine_Mc_Lf& Line : Graph.Graph)
+	// bool bOneNotValid = false;
+	// for (const FShapedLine_Mc_Lf& Line : Graph.Graph)
+	// {
+	// 	if (!IsValid(Line.Label))
+	// 	{
+	// 		bOneNotValid = true;
+	// 		break;
+	// 	}
+	// }
+
+	const int32& NumGraphLines = Graph.Graph.Num();
+	for (int32 i = 0; i < NumGraphLines; ++i)
 	{
+		FShapedLine_Mc_Lf& Line = Graph.Graph[i];
+		bool bAddedLabel = false;
 		if (!IsValid(Line.Label))
 		{
-			bOneNotValid = true;
-			break;
-		}
-	}
-
-	if (bOneNotValid || Graph.Graph.Num() != Data.Num())
-	{
-		const int32& NumGraphLines = Graph.Graph.Num();
-		for (int32 i = 0; i < NumGraphLines; ++i)
-		{
-			FShapedLine_Mc_Lf& Line = Graph.Graph[i];
-			if (!IsValid(Line.Label))
+			bAddedLabel = true;
+			if (const TObjectPtr<UUserWidget> LabelWidget = CreateWidget<UUserWidget>(GetWorld(), HardwareLabel); IsValid(LabelWidget))
 			{
-				if (const TObjectPtr<UUserWidget> LabelWidget = CreateWidget<UUserWidget>(GetWorld(), HardwareLabel); IsValid(LabelWidget))
-				{
-					Line.Label = Cast<UWidgetHardwareLabel_Mc_Lf>(LabelWidget);
-					Parent->AddChildToVerticalBox(Line.Label);
+				Line.Label = Cast<UWidgetHardwareLabel_Mc_Lf>(LabelWidget);
+				Parent->AddChildToVerticalBox(Line.Label);
 
-					if (const TObjectPtr<UVerticalBoxSlot> LabelSlot = Cast<UVerticalBoxSlot>(Line.Label->Slot); IsValid(LabelSlot))
-					{
-						FMargin LabelPadding = LabelSlot->GetPadding();
-						LabelPadding.Bottom = 5;
-						LabelSlot->SetPadding(LabelPadding);
-					}
+				if (const TObjectPtr<UVerticalBoxSlot> LabelSlot = Cast<UVerticalBoxSlot>(Line.Label->Slot); IsValid(LabelSlot))
+				{
+					FMargin LabelPadding = LabelSlot->GetPadding();
+					LabelPadding.Bottom = 5;
+					LabelSlot->SetPadding(LabelPadding);
 				}
 			}
+		}
 
+		if (bAddedLabel)
+		{
 			if (IsValid(Line.Label->LabelText))
 			{
 				Line.Label->LabelText->SetText(FText::FromString(Data[i].Name));
@@ -450,7 +452,7 @@ void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMi
 				FSlateBrush Brust = Line.Label->ColorSeparatorImage->GetBrush();
 				Brust.TintColor = Data[i].Color;
 				Line.Label->ColorSeparatorImage->SetBrush(Brust);
-			}
+			}	
 		}
 	}
 }

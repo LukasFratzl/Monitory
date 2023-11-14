@@ -3,8 +3,6 @@
 
 #include "DataTranslate_Mc_Lf.h"
 
-//#include <shlobj_core.h>
-
 #include "TcpClient_Mc_Lf.h"
 #include "WidgetMainMenu_Mc_Lf.h"
 

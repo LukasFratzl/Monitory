@@ -10,6 +10,20 @@
 #include "Tasks/Task.h"
 #include "TcpClient_Mc_Lf.generated.h"
 
+USTRUCT()
+struct MONITORY_CLIENT_API FTcpClient_Socket_Mc_Lf
+{
+	GENERATED_BODY()
+
+	FSocket* Socket = nullptr;
+
+	int32 RetryConnection = 0;
+	bool bNeedWait = false;
+	float WaitTime = 2;
+	float LastTimeReceivedMessage = 5;
+};
+
+
 UCLASS()
 class MONITORY_CLIENT_API ATcpClient_Mc_Lf : public AActor
 {
@@ -27,13 +41,11 @@ public:
 public:
 	// UE::Tasks::FTask TcpSocketTask;
 	// bool bNeedRunTcpTask = false;
-	int32 RetryConnection = 0;
-	bool bNeedWait = false;
-	float WaitTime = 2;
 	
-	FSocket* TcpSocket = nullptr;
-
-	double LastTimeReceivedMessage = 5;
+	//int32 IPAddressIndex = 0;
+	
+	TArray<FTcpClient_Socket_Mc_Lf> TcpSockets;
+	
 	inline static FString LastTcpSocketData = FString("");
 
 	inline static bool bNeedUIRebuild = false;
@@ -55,9 +67,9 @@ public:
 	// 	}
 	// }
 
-	bool ConnectToServer_Mc(const FString& ServerIP);
-	FString ReceiveData_Mc() const;
-	void CloseSocket();
+	static FSocket* ConnectToServer_Mc(const FString& ServerIP);
+	static FString ReceiveData_Mc(FSocket* Socket);
+	static void CloseSocket(FSocket* Socket);
 
 protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
