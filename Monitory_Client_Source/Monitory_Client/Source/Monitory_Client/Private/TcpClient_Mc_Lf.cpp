@@ -31,7 +31,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 	//bIsConnected = false;
 	TcpSockets.SetNum(ADataTranslate_Mc_Lf::IPAddresses.Num());
 	int32 IpIdx = 0;
-	int32 NumNotConnectedSockets = 0;
+	//int32 NumNotConnectedSockets = 0;
 	for (FTcpClient_Socket_Mc_Lf& Socket : TcpSockets)
 	{
 		IpIdx++;
@@ -46,27 +46,31 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		}
 
 		FString Data = FString("");
-		if (!Socket.Socket)
+		if (!bIsConnected || !Socket.Socket || Socket.Socket && Socket.Socket->GetConnectionState() != SCS_Connected)
 		{
-			Socket.Socket = ConnectToServer_Mc(ADataTranslate_Mc_Lf::IPAddresses[IpIdx - 1]);
-			if (!Socket.Socket)
+			if (!Socket.Socket || Socket.Socket && Socket.Socket->GetConnectionState() != SCS_Connected)
 			{
 				CloseSocket(Socket.Socket);
-				NumNotConnectedSockets++;
-				continue;
+				Socket.Socket = ConnectToServer_Mc(ADataTranslate_Mc_Lf::IPAddresses[IpIdx - 1]);
+				if (!Socket.Socket)
+				{
+					CloseSocket(Socket.Socket);
+					Socket.bNeedWait = true;
+					Socket.WaitTime = 1;
+					continue;
+				}
 			}
 
-			if (Socket.Socket)
+			if (Socket.Socket && Socket.Socket->GetConnectionState() == SCS_Connected)
 			{
 				if (Data = ReceiveData_Mc(Socket.Socket); Data.IsEmpty())
 				{
-					NumNotConnectedSockets++;
+					//NumNotConnectedSockets++;
 					Socket.RetryConnection++;
 					if (Socket.RetryConnection > 5)
 					{
 						Socket.RetryConnection = 0;
 						CloseSocket(Socket.Socket);
-						//UE_LOG(LogTemp, Display, TEXT("Not Connected, retry connection in 1000ms"));
 						Socket.bNeedWait = true;
 						Socket.WaitTime = 1;
 						continue;
@@ -91,7 +95,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 
 			//bNeedUIRebuild = true;
 			//bIsConnected = false;
-			LastTcpSocketData = FString("");
+			//LastTcpSocketData = FString("");
 			continue;
 		}
 
@@ -102,7 +106,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		}
 
 		LastTcpSocketData = Data;
-		if (Data.IsEmpty())
+		if (Data.IsEmpty() && Socket.Socket && Socket.Socket->GetConnectionState() == SCS_Connected)
 		{
 			LastTcpSocketData = ReceiveData_Mc(Socket.Socket);
 		}
@@ -119,10 +123,8 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 			bIsConnected = true;
 			return;
 		}
-		else
-		{
-			Socket.LastTimeReceivedMessage -= DeltaTime;
-		}
+
+		Socket.LastTimeReceivedMessage -= DeltaTime;
 	}
 
 	bool bFoundConnectedSocket = false;
@@ -141,9 +143,13 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		for (FTcpClient_Socket_Mc_Lf& Socket : TcpSockets)
 		{
 			CloseSocket(Socket.Socket);
+
+			const int32 RetryConnection = Socket.RetryConnection;
+			Socket = FTcpClient_Socket_Mc_Lf();
+			Socket.RetryConnection = RetryConnection;
 		}
 
-		TcpSockets.Empty();
+		//TcpSockets.Empty();
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("%d %s"), bIsConnected, *LastTcpSocketData);
@@ -183,6 +189,7 @@ FSocket* ATcpClient_Mc_Lf::ConnectToServer_Mc(const FString& ServerIP)
 		//UE_LOG(LogTemp, Warning, TEXT("Connected to server"));
 		return Socket;
 	}
+	CloseSocket(Socket);
 	return nullptr;
 }
 
