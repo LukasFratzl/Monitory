@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Text;
@@ -80,6 +81,15 @@ namespace Monitory_Server_Windows
 				{
 					Console.WriteLine("\tSensor: {0}, Type: {1}, Value: {2}", sensor.Name, sensor.SensorType, sensor.Value);
 				}
+			}
+
+			try
+			{
+				RunW32tmResync();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
 			}
 
 			bool bNeedExit = false;
@@ -520,6 +530,45 @@ namespace Monitory_Server_Windows
 					up[hardwareName] = value;
 				}
 			}
+		}
+
+
+		public static void RunW32tmResync()
+		{
+			// Create a new process start info
+			ProcessStartInfo processStartInfo = new ProcessStartInfo
+			{
+				FileName = "cmd.exe", // Specify the command prompt executable
+				RedirectStandardInput = true,
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				CreateNoWindow = true
+			};
+
+			// Create a new process
+			Process process = new Process { StartInfo = processStartInfo };
+
+			// Start the process
+			process.Start();
+
+			// Execute the w32tm /resync command
+			using (var sw = process.StandardInput)
+			{
+				if (sw.BaseStream.CanWrite)
+				{
+					sw.WriteLine("w32tm /resync");
+				}
+			}
+
+			// Wait for the process to exit
+			process.WaitForExit();
+
+			// Display the output (optional)
+			string output = process.StandardOutput.ReadToEnd();
+			Console.WriteLine(output);
+
+			// Close the process
+			process.Close();
 		}
 
 	}
