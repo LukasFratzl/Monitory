@@ -27,44 +27,51 @@ namespace Monitory_Server_Linux
 
             while (!bNeedExit)
             {
-                if (!_cpuUtilThreadRunning)
+                try
                 {
-                    _cpuUtilThreadRunning = true;
-                    Thread thread = new Thread(() =>
+                    if (!_cpuUtilThreadRunning)
                     {
-                        _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
+                        _cpuUtilThreadRunning = true;
+                        Thread thread = new Thread(() =>
+                        {
+                            _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
 
-                        _cpuUtilThreadRunning = false;
-                    });
-                    thread.Start();
+                            _cpuUtilThreadRunning = false;
+                        });
+                        thread.Start();
+                    }
+
+                    if (!_drivesThreadRunning)
+                    {
+                        _drivesThreadRunning = true;
+                        Thread thread = new Thread(() =>
+                        {
+                            _lastDrivesUtilString = RunCommand("bash", "-c \"iostat -d -x 1 2\"");
+
+                            _drivesThreadRunning = false;
+                        });
+                        thread.Start();
+                    }
+
+                    if (!_networkInfoThreadRunning)
+                    {
+                        _networkInfoThreadRunning = true;
+                        Thread thread = new Thread(() =>
+                        {
+                            _lastNetworkUtilString = RunCommand("bash", "-c \"ifstat -nt -T 1 1\"");
+
+                            _networkInfoThreadRunning = false;
+                        });
+                        thread.Start();
+                    }
+
+                    _dataToSend = CollectData();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
 
-                if (!_drivesThreadRunning)
-                {
-                    _drivesThreadRunning = true;
-                    Thread thread = new Thread(() =>
-                    {
-                        _lastDrivesUtilString = RunCommand("bash", "-c \"iostat -d -x 1 2\"");
-
-                        _drivesThreadRunning = false;
-                    });
-                    thread.Start();
-                }
-
-                if (!_networkInfoThreadRunning)
-                {
-                    _networkInfoThreadRunning = true;
-                    Thread thread = new Thread(() =>
-                    {
-                        _lastNetworkUtilString = RunCommand("bash", "-c \"ifstat -nt -T 1 1\"");
-
-                        _networkInfoThreadRunning = false;
-                    });
-                    thread.Start();
-                }
-
-                _dataToSend = CollectData();
-                //Console.WriteLine(DataToSend);
                 Thread.Sleep(300);
             }
 

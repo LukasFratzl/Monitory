@@ -8,31 +8,24 @@
     "net6.0": []
   },
   "packageFolders": {
-    "C:\\Users\\lukas\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "/home/flow____/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\lukas\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\Monitory_Server_Linux.csproj",
+      "projectUniqueName": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
       "projectName": "Monitory_Server_Linux",
-      "projectPath": "C:\\Users\\lukas\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\Monitory_Server_Linux.csproj",
-      "packagesPath": "C:\\Users\\lukas\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\lukas\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\obj\\",
+      "projectPath": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
+      "packagesPath": "/home/flow____/.nuget/packages/",
+      "outputPath": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\lukas\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "/home/flow____/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
       ],
       "sources": {
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -56,8 +49,7 @@
           "net47",
           "net471",
           "net472",
-          "net48",
-          "net481"
+          "net48"
         ],
         "assetTargetFallback": true,
         "warn": true,
@@ -66,7 +58,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.102\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/6.0.125/RuntimeIdentifierGraph.json"
       }
     }
   }
