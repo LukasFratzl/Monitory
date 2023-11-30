@@ -23,4 +23,5 @@
  - Run it and Play with the customization settings
  - White List the Server IP, you can have multiple Servers and it should connect with the Server
 
- <img src="https://www.dropbox.com/scl/fi/xexc0jpqudlba9a0htw3i/Monitory_Client_1.gif?rlkey=7k3xhyzu2i72izgi712t1ghlt&dl=1">
+
+ ![Client App](Monitory_Client_1.gif)
