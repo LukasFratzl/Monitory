@@ -17,11 +17,9 @@
 
 ## Client:
 *_Monitory Client Apps are available for Android, this apps reading the TCP Data sended from the Monitory Server App to display the Hardware Infos on this Client Device_*
+ ![Client App](Monitory_Client_1.gif)
 #### Android:
  - Navigate to the Releases and download an Android Client version
  - Install it on your Android Device, it needs to be 64 Bit, Android 8 or Higher, ES3.1 or Higher
  - Run it and Play with the customization settings
  - White List the Server IP, you can have multiple Servers and it should connect with the Server
-
-
- ![Client App](Monitory_Client_1.gif)
