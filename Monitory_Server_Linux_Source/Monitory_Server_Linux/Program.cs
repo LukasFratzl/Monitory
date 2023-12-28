@@ -34,7 +34,14 @@ namespace Monitory_Server_Linux
                         _cpuUtilThreadRunning = true;
                         Thread thread = new Thread(() =>
                         {
-                            _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
+                            try
+                            {
+                                _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
 
                             _cpuUtilThreadRunning = false;
                         });
@@ -46,7 +53,14 @@ namespace Monitory_Server_Linux
                         _drivesThreadRunning = true;
                         Thread thread = new Thread(() =>
                         {
-                            _lastDrivesUtilString = RunCommand("bash", "-c \"iostat -d -x 1 2\"");
+                            try
+                            {
+                                _lastDrivesUtilString = RunCommand("bash", "-c \"iostat -d -x 1 2\"");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
 
                             _drivesThreadRunning = false;
                         });
@@ -58,7 +72,14 @@ namespace Monitory_Server_Linux
                         _networkInfoThreadRunning = true;
                         Thread thread = new Thread(() =>
                         {
-                            _lastNetworkUtilString = RunCommand("bash", "-c \"ifstat -nt -T 1 1\"");
+                            try
+                            {
+                                _lastNetworkUtilString = RunCommand("bash", "-c \"ifstat -nt -T 1 1\"");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
 
                             _networkInfoThreadRunning = false;
                         });
@@ -214,7 +235,6 @@ namespace Monitory_Server_Linux
 
             if (splittedUtilityString.Length > 2)
             {
-                
                 string[] allCpuRow = splittedUtilityString[2].Split(' ', StringSplitOptions.RemoveEmptyEntries)
                     ;
                 //string utilityValue = allCpuRow[allCpuRow.Length - 1].Replace(',', '.');
@@ -375,7 +395,7 @@ namespace Monitory_Server_Linux
                 StringSplitOptions.RemoveEmptyEntries);
 
             if (splittedNetworkString.Length <= 2) return;
-            
+
             string[] networkRow = splittedNetworkString[2]
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
@@ -432,7 +452,7 @@ namespace Monitory_Server_Linux
             //Console.WriteLine("This is the String ->" + wattageString);
 
             // TODO:
-            
+
             properties += $"Wattage:{name}:0:0:100|";
             properties += $"Temperature:{name}::0:0:100|";
         }
@@ -469,7 +489,7 @@ namespace Monitory_Server_Linux
 
             float gpuTemp = 0;
             float.TryParse(temp.Replace(',', '.'), out gpuTemp);
-            
+
             properties += $"Gpu_Utility:Clock:{gpuUtil}:0:100|";
             properties += $"Gpu_Clock:Clock:{gpuClock}:0:100|";
             properties += $"Gpu_Memory:Available:{gpuMemAvailable}:0:100|";
