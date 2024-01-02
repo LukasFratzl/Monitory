@@ -23,3 +23,7 @@
  - Install it on your Android Device, it needs to be 64 Bit, Android 8 or Higher, ES3.1 or Higher
  - Run it and Play with the customization settings
  - White List the Server IP, you can have multiple Servers and it should connect with the Server
+
+## Development:
+ - Server Applications are writtent in c# .NET, open the solution and build it
+ - Client Application is written in Unreal Engine 5 C++, you need to have UE5.2 Installed and you need to own a copy of [UMG Spline](https://www.unrealengine.com/marketplace/en-US/product/umgspline?sessionInvalidated=true) and install it to the Engine
