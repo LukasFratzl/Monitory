@@ -101,8 +101,8 @@ void UWidgetMainMenu_Mc_Lf::CacheBoxes(UVerticalBox* WattageParentContainer, UVe
 }
 
 void UWidgetMainMenu_Mc_Lf::CacheTextBlocks(UTextBlock* CpuUtilizationTotal, UTextBlock* CpuClockTotal, UTextBlock* RamUtilizationPercent, UTextBlock* RamUtilizationGB, UTextBlock* RamUtilizationGB_50PercentGB, UTextBlock* RamUtilizationGB_100PercentGB, UTextBlock* GpuUtilizationTotal, UTextBlock* GpuClockTotal, UTextBlock* GpuRamUtilizationPercent, UTextBlock* GpuRamUtilizationGB, UTextBlock* GpuRamUtilizationGB_50PercentGB, UTextBlock* GpuRamUtilizationGB_100PercentGB,
-                                            UTextBlock* WattageValue, UTextBlock* WattageValueMax, UTextBlock* WattageValue_50Percent, UTextBlock* WattageValue_100Percent, UTextBlock* TemperatureValue, UTextBlock* TemperatureValueMax, UTextBlock* TemperatureValue_50Percent, UTextBlock* TemperatureValue_100Percent, UTextBlock* DriveUtilizationTotal, UTextBlock* TimeNow, UTextBlock* DateNow, UTextBlock* NetUpSpeedMax, UTextBlock* NetDownSpeedMax, UTextBlock* NetMaxSpeed_50Percent,
-                                            UTextBlock* NetMaxSpeed_100Percent)
+	UTextBlock* WattageValue, UTextBlock* WattageValueMax, UTextBlock* WattageValue_50Percent, UTextBlock* WattageValue_100Percent, UTextBlock* TemperatureValue, UTextBlock* TemperatureValueMax, UTextBlock* TemperatureValue_50Percent, UTextBlock* TemperatureValue_100Percent, UTextBlock* DriveUtilizationTotal, UTextBlock* TimeNow_Server, UTextBlock* DateNow_Server, UTextBlock* TimeNow_Client, UTextBlock* DateNow_Client, UTextBlock* NetUpSpeedMax, UTextBlock* NetDownSpeedMax, UTextBlock* NetMaxSpeed_50Percent,
+	UTextBlock* NetMaxSpeed_100Percent)
 {
 	CpuUtilizationTotalTextBlock = CpuUtilizationTotal;
 	CpuClockTotalTextBlock = CpuClockTotal;
@@ -133,8 +133,11 @@ void UWidgetMainMenu_Mc_Lf::CacheTextBlocks(UTextBlock* CpuUtilizationTotal, UTe
 
 	DriveUtilizationTotalTextBlock = DriveUtilizationTotal;
 
-	TimeNowTextBlock = TimeNow;
-	DateNowTextBlock = DateNow;
+	TimeNowTextBlock_Server = TimeNow_Server;
+	DateNowTextBlock_Server = DateNow_Server;
+
+	TimeNowTextBlock_Client = TimeNow_Client;
+	DateNowTextBlock_Client = DateNow_Client;
 
 	NetMaxDownSpeedTextBlock = NetDownSpeedMax;
 	NetMaxUpSpeedTextBlock = NetUpSpeedMax;
@@ -226,6 +229,16 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 		ADataTranslate_Mc_Lf::bChangedIPAddresses = false;
 	}
 
+	if (IsValid(TimeNowTextBlock_Client))
+	{
+		TimeNowTextBlock_Client->SetText(FText::FromString(FDateTime::Now().ToString(TEXT("%H:%M"))));
+	}
+
+	if (IsValid(DateNowTextBlock_Client))
+	{
+		DateNowTextBlock_Client->SetText(FText::FromString(FDateTime::Now().ToString(TEXT("%d/%m/%Y"))));
+	}
+
 	return bInitThisFrame;
 }
 
@@ -298,13 +311,13 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	// Drive -> End
 
 	// Time -> Start
-	if (IsValid(TimeNowTextBlock))
+	if (IsValid(TimeNowTextBlock_Server))
 	{
-		TimeNowTextBlock->SetText(FText::FromString(ADataTranslate_Mc_Lf::PcData.TimeNow.Name));
+		TimeNowTextBlock_Server->SetText(FText::FromString(ADataTranslate_Mc_Lf::PcData.TimeNow.Name));
 	}
-	if (IsValid(DateNowTextBlock))
+	if (IsValid(DateNowTextBlock_Server))
 	{
-		DateNowTextBlock->SetText(FText::FromString(ADataTranslate_Mc_Lf::PcData.DateNow.Name));
+		DateNowTextBlock_Server->SetText(FText::FromString(ADataTranslate_Mc_Lf::PcData.DateNow.Name));
 	}
 	// Time -> End
 
@@ -708,4 +721,11 @@ void UWidgetMainMenu_Mc_Lf::ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, f
 		// Add more settings -> It's currently without separator
 		ADataTranslate_Mc_Lf::SaveDataToInternalStorage(Data, ADataTranslate_Mc_Lf::ThemeSettingsFileName);
 	}
+}
+
+FString UWidgetMainMenu_Mc_Lf::GetDeviceTime()
+{
+	const auto& Time = FDateTime::Now();
+
+	return Time.ToString();
 }

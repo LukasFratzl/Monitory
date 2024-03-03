@@ -257,10 +257,16 @@ public:
 	TObjectPtr<UTextBlock> DriveUtilizationTotalTextBlock;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTextBlock> TimeNowTextBlock;
+	TObjectPtr<UTextBlock> TimeNowTextBlock_Server;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UTextBlock> DateNowTextBlock;
+	TObjectPtr<UTextBlock> DateNowTextBlock_Server;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTextBlock> TimeNowTextBlock_Client;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTextBlock> DateNowTextBlock_Client;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UCanvasPanel> NetUtilizationCanvasPanel;
@@ -312,7 +318,7 @@ public:
 	void CacheBoxes(UVerticalBox* WattageParentContainer, UVerticalBox* TemperatureParentContainer, UVerticalBox* IPAddresses);
 
 	UFUNCTION(BlueprintCallable)
-	void CacheTextBlocks(UTextBlock* CpuUtilizationTotal, UTextBlock* CpuClockTotal, UTextBlock* RamUtilizationPercent, UTextBlock* RamUtilizationGB, UTextBlock* RamUtilizationGB_50PercentGB, UTextBlock* RamUtilizationGB_100PercentGB, UTextBlock* GpuUtilizationTotal, UTextBlock* GpuClockTotal, UTextBlock* GpuRamUtilizationPercent, UTextBlock* GpuRamUtilizationGB, UTextBlock* GpuRamUtilizationGB_50PercentGB, UTextBlock* GpuRamUtilizationGB_100PercentGB, UTextBlock* WattageValue, UTextBlock* WattageValueMax, UTextBlock* WattageValue_50Percent, UTextBlock* WattageValue_100Percent, UTextBlock* TemperatureValue, UTextBlock* TemperatureValueMax, UTextBlock* TemperatureValue_50Percent, UTextBlock* TemperatureValue_100Percent, UTextBlock* DriveUtilizationTotal, UTextBlock* TimeNow, UTextBlock* DateNow, UTextBlock* NetUpSpeedMax, UTextBlock* NetDownSpeedMax, UTextBlock* NetMaxSpeed_50Percent, UTextBlock* NetMaxSpeed_100Percent);
+	void CacheTextBlocks(UTextBlock* CpuUtilizationTotal, UTextBlock* CpuClockTotal, UTextBlock* RamUtilizationPercent, UTextBlock* RamUtilizationGB, UTextBlock* RamUtilizationGB_50PercentGB, UTextBlock* RamUtilizationGB_100PercentGB, UTextBlock* GpuUtilizationTotal, UTextBlock* GpuClockTotal, UTextBlock* GpuRamUtilizationPercent, UTextBlock* GpuRamUtilizationGB, UTextBlock* GpuRamUtilizationGB_50PercentGB, UTextBlock* GpuRamUtilizationGB_100PercentGB, UTextBlock* WattageValue, UTextBlock* WattageValueMax, UTextBlock* WattageValue_50Percent, UTextBlock* WattageValue_100Percent, UTextBlock* TemperatureValue, UTextBlock* TemperatureValueMax, UTextBlock* TemperatureValue_50Percent, UTextBlock* TemperatureValue_100Percent, UTextBlock* DriveUtilizationTotal, UTextBlock* TimeNow_Server, UTextBlock* DateNow_Server, UTextBlock* TimeNow_Client, UTextBlock* DateNow_Client, UTextBlock* NetUpSpeedMax, UTextBlock* NetDownSpeedMax, UTextBlock* NetMaxSpeed_50Percent, UTextBlock* NetMaxSpeed_100Percent);
 
 	UFUNCTION(BlueprintCallable)
 	void CacheButtons(UButton* IpAddressAdd);
@@ -347,4 +353,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ApplyTheme(FTheme_Mc_Lf Theme, float BlurStrength, float BlacknessAmount, bool bAnimated);
+
+	UFUNCTION(BlueprintCallable)
+	FString GetDeviceTime();
 };
