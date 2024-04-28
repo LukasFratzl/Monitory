@@ -17,6 +17,7 @@ namespace Monitory_Server_Windows
 		private const string FreeName = "free";
 		private const string VirtualName = "virtual";
 		private const string TjName = "tj";
+		private const string HotSpotName = "hot";
 		private const string DownloadName = "down";
 		private const string UploadName = "up";
 
@@ -47,70 +48,23 @@ namespace Monitory_Server_Windows
 			Console.WriteLine("Thanks a lot for coming that far...");
 			Console.WriteLine("Make sure to run the app as admin, otherwise some monitor fetures are not available...");
 
-			_computer = new Computer
+			bool bRunning = true;
+			
+			bool bInit = true;
+			while (bRunning)
 			{
-				IsCpuEnabled = true,
-				IsGpuEnabled = true,
-				IsMemoryEnabled = true,
-				IsMotherboardEnabled = true,
-				IsControllerEnabled = true,
-				IsNetworkEnabled = true,
-				IsStorageEnabled = true
-			};
-
-			_computer.Open();
-			_computer.Accept(new UpdateVisitor());
-
-			foreach (IHardware hardware in _computer.Hardware)
-			{
-				Console.WriteLine("Hardware Type: {0}", hardware.HardwareType);
-				Console.WriteLine("Hardware: {0}", hardware.Name);
-
-				foreach (IHardware subhardware in hardware.SubHardware)
+				try
 				{
-					Console.WriteLine("\tSubhardware Type: {0}", subhardware.HardwareType);
-					Console.WriteLine("\tSubhardware: {0}", subhardware.Name);
-
-					foreach (ISensor sensor in subhardware.Sensors)
-					{
-						Console.WriteLine("\t\tSensor: {0}, Type: {1}, Value: {2}", sensor.Name, sensor.SensorType, sensor.Value);
-					}
+					MainLoop(bInit);
+					bInit = false;
 				}
-
-				foreach (ISensor sensor in hardware.Sensors)
+				catch (Exception e)
 				{
-					Console.WriteLine("\tSensor: {0}, Type: {1}, Value: {2}", sensor.Name, sensor.SensorType, sensor.Value);
+					Console.WriteLine(e);
+
+					Thread.Sleep(500);
 				}
 			}
-
-			try
-			{
-				RunW32tmResync();
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
-
-			bool bNeedExit = false;
-
-			Program main = new Program();
-			main.server_start();  //starting the server
-
-			while (!bNeedExit)
-			{
-				_dataToSend = CollectData();
-				Thread.Sleep(300);
-			}
-
-			Console.WriteLine("Press any key to exit...");
-
-			// Wait for a key press
-			Console.ReadKey();
-
-			Console.WriteLine("Exiting the program.");
-
-			_computer.Close();
 		}
 
 		private void server_start()
@@ -158,6 +112,81 @@ namespace Monitory_Server_Windows
 
 		}
 
+		static void MainLoop(bool bIsInit)
+		{
+			_computer = new Computer
+			{
+				IsCpuEnabled = true,
+				IsGpuEnabled = true,
+				IsMemoryEnabled = true,
+				IsMotherboardEnabled = true,
+				IsControllerEnabled = true,
+				IsNetworkEnabled = true,
+				IsStorageEnabled = true
+			};
+
+			_computer.Open();
+			_computer.Accept(new UpdateVisitor());
+
+			if (bIsInit)
+			{
+				foreach (IHardware hardware in _computer.Hardware)
+				{
+					Console.WriteLine("Hardware Type: {0}", hardware.HardwareType);
+					Console.WriteLine("Hardware: {0}", hardware.Name);
+
+					foreach (IHardware subhardware in hardware.SubHardware)
+					{
+						Console.WriteLine("\tSubhardware Type: {0}", subhardware.HardwareType);
+						Console.WriteLine("\tSubhardware: {0}", subhardware.Name);
+
+						foreach (ISensor sensor in subhardware.Sensors)
+						{
+							Console.WriteLine("\t\tSensor: {0}, Type: {1}, Value: {2}", sensor.Name, sensor.SensorType,
+								sensor.Value);
+						}
+					}
+
+					foreach (ISensor sensor in hardware.Sensors)
+					{
+						Console.WriteLine("\tSensor: {0}, Type: {1}, Value: {2}", sensor.Name, sensor.SensorType,
+							sensor.Value);
+					}
+				}	
+			}
+
+			if (bIsInit)
+			{
+				try
+				{
+					RunW32tmResync();
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
+			}
+
+			bool bNeedExit = false;
+
+			Program main = new Program();
+			main.server_start(); //starting the server
+
+			while (!bNeedExit)
+			{
+				_dataToSend = CollectData();
+				Thread.Sleep(300);
+			}
+
+			Console.WriteLine("Press any key to exit...");
+
+			// Wait for a key press
+			Console.ReadKey();
+
+			Console.WriteLine("Exiting the program.");
+
+			_computer.Close();
+		}
 
 		static string CollectData()
 		{
@@ -415,7 +444,8 @@ namespace Monitory_Server_Windows
 		public static void CollectTemperatureData(ISensor sensor, string hardwareName, ref Dictionary<string, Vector3> temps)
 		{
 			string sensorName = sensor.Name.ToLower();
-			if (sensor.SensorType == SensorType.Temperature && !sensorName.Contains(TjName))
+			if (sensor.SensorType == SensorType.Temperature && !sensorName.Contains(TjName) && !sensorName.Contains(
+				    HotSpotName))
 			{
 				temps.TryAdd(hardwareName, new Vector3());
 
