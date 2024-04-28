@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Monitory_Server_Linux/1.0.0": {
+        "runtime": {
+          "Monitory_Server_Linux.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Monitory_Server_Linux/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
