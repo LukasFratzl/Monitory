@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3 uid="uid://b6pvb7hh55sbv"]
+
+[ext_resource type="Texture2D" uid="uid://dlwpq27ucubse" path="res://assets/textures/bg_Tex_8.png" id="1_1wb3l"]
+[ext_resource type="VideoStream" path="res://assets/movies/renders/bg_1.ogv" id="2_5cko5"]
+[ext_resource type="Script" path="res://scripts/VideoPlayerLogic.gd" id="3_nsuhi"]
+[ext_resource type="Shader" path="res://assets/materials/blur_shader.gdshader" id="4_xjdkq"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b24rx"]
+shader = ExtResource("4_xjdkq")
+shader_parameter/lod = 1.478
+
+[sub_resource type="CanvasTexture" id="CanvasTexture_wjdd7"]
+
+[node name="MainUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="FallbackImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_1wb3l")
+stretch_mode = 6
+
+[node name="VideoPlayer" type="VideoStreamPlayer" parent="."]
+layout_mode = 0
+offset_top = -227.438
+offset_right = 2446.0
+offset_bottom = 1148.44
+stream = ExtResource("2_5cko5")
+volume_db = -80.0
+autoplay = true
+expand = true
+loop = true
+script = ExtResource("3_nsuhi")
+fit_to_screen_size = Vector2i(2560, 1440)
+
+[node name="Blur" type="TextureRect" parent="."]
+material = SubResource("ShaderMaterial_b24rx")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("CanvasTexture_wjdd7")
