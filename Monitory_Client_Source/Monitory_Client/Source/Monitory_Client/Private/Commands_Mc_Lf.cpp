@@ -24,7 +24,7 @@ void ACommands_Mc_Lf::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ACommands_Mc_Lf::LimitFPS(const int32& Fps)
+void ACommands_Mc_Lf::LimitFPS(const int32 Fps)
 {
 	const FString& MaxFps = FString::Printf(TEXT("t.MaxFPS %d"), Fps);
 	GEngine->Exec(GetWorld(), *MaxFps);

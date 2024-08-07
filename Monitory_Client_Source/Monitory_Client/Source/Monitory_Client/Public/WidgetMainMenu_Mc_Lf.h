@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "DataTranslate_Mc_Lf.h"
+#include "GraphFillWidget_Mc_Lf.h"
 #include "MediaSource.h"
 #include "SplineWidget.h"
 #include "WidgetHardwareLabel_Mc_Lf.h"
@@ -68,6 +69,26 @@ struct MONITORY_CLIENT_API FShapedLine_Mc_Lf : public FLine_Mc_Lf
 	TArray<double> ValueHistory;
 };
 
+USTRUCT()
+struct MONITORY_CLIENT_API FFilledGraphArea_Mc_Lf
+{
+	GENERATED_BODY()
+
+	FFilledGraphArea_Mc_Lf()
+	{
+	}
+
+	~FFilledGraphArea_Mc_Lf()
+	{
+	}
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UGraphFillWidget_Mc_Lf> FillWidget;
+
+	// UPROPERTY(EditAnywhere)
+	// TArray<double> ValueHistory;
+};
+
 
 
 USTRUCT()
@@ -77,6 +98,24 @@ struct MONITORY_CLIENT_API FGraph_Mc_Lf
 
 	FGraph_Mc_Lf(){}
 	~FGraph_Mc_Lf(){}
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> FillMaterialOverride;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> LineMaterialOverride;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor FillColor = FLinearColor(1, 1, 1, 0.5f);
+
+	UPROPERTY(EditAnywhere)
+	bool bUseLineColorOverride = false;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor LineColorOverride = FLinearColor::White;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor SeparatorLineColor = FLinearColor::White;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FShapedLine_Mc_Lf> Graph;
@@ -90,8 +129,8 @@ struct MONITORY_CLIENT_API FGraph_Mc_Lf
 	UPROPERTY(EditAnywhere)
 	FStraightLine_Mc_Lf AverageLine;
 
-	// UPROPERTY(EditAnywhere)
-	// int32 NumGraphLines = 1;
+	UPROPERTY(EditAnywhere)
+	FFilledGraphArea_Mc_Lf FillArea;
 
 	UPROPERTY(EditAnywhere)
 	FVector2D CurrentCanvasSize = FVector2D::ZeroVector;
@@ -307,12 +346,21 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<FTheme_Mc_Lf> CachedThemes;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> GraphLinesMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> GraphFillAreaMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UCanvasPanel> GraphCollectionCanvasPanel;
+
 	UFUNCTION(BlueprintCallable)
 	void OnAddIPButtonPressed();
 	
 
 	UFUNCTION(BlueprintCallable)
-	void CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCanvasPanel* RamUtilization, UCanvasPanel* GpuUtilization, UCanvasPanel* GpuRamUtilization, UCanvasPanel* WattageCanvas, UCanvasPanel* TemperatureCanvas, UCanvasPanel* DriveUtilization, UCanvasPanel* NetUtilization, UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel);
+	void CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCanvasPanel* RamUtilization, UCanvasPanel* GpuUtilization, UCanvasPanel* GpuRamUtilization, UCanvasPanel* WattageCanvas, UCanvasPanel* TemperatureCanvas, UCanvasPanel* DriveUtilization, UCanvasPanel* NetUtilization, UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel, UCanvasPanel* GraphPanel);
 
 	UFUNCTION(BlueprintCallable)
 	void CacheBoxes(UVerticalBox* WattageParentContainer, UVerticalBox* TemperatureParentContainer, UVerticalBox* IPAddresses);
@@ -337,13 +385,13 @@ public:
 	void TickMonitoringPanel(float DeltaTime);
 
 
-	void InitGraph(FGraph_Mc_Lf& Graph, const int32& NumPoints, const int32& NumLines, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
+	void InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints, const int32 NumLines, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
 
 	void InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const TObjectPtr<UVerticalBox>& Parent) const;
 	void AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const EPrecisionPoint& Precision, const TObjectPtr<UVerticalBox>& Parent) const;
 
-	FVector2D AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const bool& bIsRelativeGraph, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
-	static void AdvanceText(const TObjectPtr<UTextBlock> Text, const double& Value, const EPrecisionPoint& Precision, const FString& FormatMessage);
+	FVector2D AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, bool bIsRelativeGraph, const FLinearColor& FillAreaColor, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
+	static void AdvanceText(const TObjectPtr<UTextBlock> Text, const double Value, const EPrecisionPoint& Precision, const FString& FormatMessage);
 
 	UFUNCTION(BlueprintCallable)
 	void FitBackgroundImageToScreen(UScaleBox* BgImage, const FVector2D TextureSize);

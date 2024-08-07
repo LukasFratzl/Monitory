@@ -30,7 +30,7 @@ void ASettings_Mc_Lf::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ASettings_Mc_Lf::Set3DWorldEnabled(const bool& bEnabled) const
+void ASettings_Mc_Lf::Set3DWorldEnabled(bool bEnabled) const
 {
 	if (const TObjectPtr<ULocalPlayer> ClientPlayer = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetLocalPlayer(); IsValid(ClientPlayer))
 	{
@@ -43,7 +43,7 @@ void ASettings_Mc_Lf::Set3DWorldEnabled(const bool& bEnabled) const
 	}
 }
 
-void ASettings_Mc_Lf::SetShowMouseEnabled(const bool& bEnabled) const
+void ASettings_Mc_Lf::SetShowMouseEnabled(bool bEnabled) const
 {
 	if (const TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0); IsValid(PlayerController))
 	{

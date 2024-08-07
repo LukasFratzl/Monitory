@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "5.2",
+	"EngineAssociation": "5.4",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -22,6 +22,11 @@
 			"Name": "UMGSpline",
 			"Enabled": true,
 			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/30369ae6505949c68913cb12a071a9df"
+		},
+		{
+			"Name": "UMGPolygon",
+			"Enabled": true,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/c0894dba801749459d1ad2aa8b22f25b"
 		}
 	]
 }

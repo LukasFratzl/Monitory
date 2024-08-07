@@ -167,12 +167,12 @@ public:
 	// bool bNeedRunWriteTask = false;
 	
 	static void CreatePCData(FPCData_Mc_Lf& FromData, const FString& FromString);
-	static FString ReadOneLineFromFile(const int32& LineIndex);
+	static FString ReadOneLineFromFile(const int32 LineIndex);
 	static FLinearColor HSVToRGB(float H, float S, float V);
 
 	static FLinearColor GenerateDistinctColors(int32 Index);
-	static FString FormatDoubleWithOneDecimal(const double& ValueToFormat);
-	static FString FormatDoubleWithTwoDecimals(const double& ValueToFormat);
+	static FString FormatDoubleWithOneDecimal(const double ValueToFormat);
+	static FString FormatDoubleWithTwoDecimals(const double ValueToFormat);
 	static FString FormatDoubleWithoutDecimals(double ValueToFormat);
 
 	static FString GetAppVersion();

@@ -26,7 +26,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Commands")
-	void LimitFPS(const int32& Fps);
+	void LimitFPS(const int32 Fps);
 
 	inline static bool bFreshCommands = true;
 

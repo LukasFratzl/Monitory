@@ -15,11 +15,13 @@ public class Monitory_Client : ModuleRules
 			"Engine", 
 			"InputCore" ,
 			"UMG", 
-			"UMGSpline", 
+			"UMGSpline",
 			"SlateCore",
+			"Slate",
 			"Sockets",
 			"Networking",
-			"HTTP", "MediaAssets"
+			"HTTP",
+			"MediaAssets"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[]
@@ -30,6 +32,11 @@ public class Monitory_Client : ModuleRules
 			"Sockets",
 			"Networking",
 			"HTTP",
+			"UMG",
+			"SlateCore",
+			"Slate",
+			"GeometryCore"
+
 		});
 
 		// Uncomment if you are using Slate UI

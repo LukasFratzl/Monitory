@@ -98,9 +98,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		{
 			const FString& Type = EntryParts[0];
 			const FString& Unit = EntryParts[1];
-			const double& Current = FCString::Atod(*EntryParts[2]);
-			const double& Min = FCString::Atod(*EntryParts[3]);
-			const double& Max = FCString::Atod(*EntryParts[4]);
+			const double Current = FCString::Atod(*EntryParts[2]);
+			const double Min = FCString::Atod(*EntryParts[3]);
+			const double Max = FCString::Atod(*EntryParts[4]);
 
 			if (Type == "Cpu_Utility")
 			{
@@ -327,7 +327,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		}
 	}
 
-	if (const int32& NumThreads = CpuThreadsRaw.Num())
+	if (const int32 NumThreads = CpuThreadsRaw.Num())
 	{
 		FromData.CpuLoadThreads.SetNum(NumThreads);
 		for (int32 ThreadIdx = 0; ThreadIdx < NumThreads; ++ThreadIdx)
@@ -335,7 +335,8 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			FDataMinMaxCurrent_Mc_Lf& Thread = FromData.CpuLoadThreads[ThreadIdx];
 			const FDataMinMaxCurrent_Mc_Lf& Thread_Raw = CpuThreadsRaw[ThreadIdx];
 
-			Thread.Current = (Thread_Raw.Current + Thread.Current) / 2;
+			//Thread.Current = (Thread_Raw.Current + Thread.Current) / 2;
+			Thread.Current = Thread_Raw.Current;
 			Thread.Index = Thread_Raw.Index;
 			Thread.Min = Thread_Raw.Min;
 			Thread.Max = Thread_Raw.Max;
@@ -343,7 +344,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		}
 	}
 
-	if (const int32& NumWattage = WattageRaw.Num())
+	if (const int32 NumWattage = WattageRaw.Num())
 	{
 		FromData.Wattage.SetNum(NumWattage);
 
@@ -365,7 +366,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		}
 	}
 
-	if (const int32& NumTemps = TemperatureRaw.Num())
+	if (const int32 NumTemps = TemperatureRaw.Num())
 	{
 		FromData.Temperature.SetNum(NumTemps);
 
@@ -396,7 +397,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		}
 	}
 
-	if (const int32& NumDrives = DriveLoadRaw.Num())
+	if (const int32 NumDrives = DriveLoadRaw.Num())
 	{
 		FromData.DrivesLoad.SetNum(NumDrives);
 		FromData.DrivesMaxLoad.Current = 0;
@@ -430,7 +431,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		}
 	}
 	
-	if (const int32& NumDownloadSpeeds = DownloadSpeedRaw.Num())
+	if (const int32 NumDownloadSpeeds = DownloadSpeedRaw.Num())
 	{
 		FromData.DownloadSpeeds.SetNum(NumDownloadSpeeds);
 		FromData.DownloadMaxSpeed.Current = 0;
@@ -464,7 +465,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 		FromData.DownloadMaxSpeed.Color = GenerateDistinctColors(5);
 	}
 
-	if (const int32& NumUploadSpeeds = UploadSpeedRaw.Num())
+	if (const int32 NumUploadSpeeds = UploadSpeedRaw.Num())
 	{
 		FromData.UploadSpeeds.SetNum(NumUploadSpeeds);
 		FromData.UploadMaxSpeed.Current = 0;
@@ -533,7 +534,7 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 }
 
 
-FString ADataTranslate_Mc_Lf::ReadOneLineFromFile(const int32& LineIndex)
+FString ADataTranslate_Mc_Lf::ReadOneLineFromFile(const int32 LineIndex)
 {
 	// // Get the desktop directory path
 	// if (TCHAR DesktopPath[MAX_PATH]; SHGetFolderPath(NULL, CSIDL_DESKTOPDIRECTORY, NULL, 0, DesktopPath) == S_OK)
@@ -633,12 +634,12 @@ FLinearColor ADataTranslate_Mc_Lf::GenerateDistinctColors(int32 Index)
 	return DistinctColors[MaxIndex];
 }
 
-FString ADataTranslate_Mc_Lf::FormatDoubleWithOneDecimal(const double& ValueToFormat)
+FString ADataTranslate_Mc_Lf::FormatDoubleWithOneDecimal(const double ValueToFormat)
 {
 	return FString::Printf(TEXT("%.1f"), ValueToFormat);
 }
 
-FString ADataTranslate_Mc_Lf::FormatDoubleWithTwoDecimals(const double& ValueToFormat)
+FString ADataTranslate_Mc_Lf::FormatDoubleWithTwoDecimals(const double ValueToFormat)
 {
 	return FString::Printf(TEXT("%.2f"), ValueToFormat);
 }

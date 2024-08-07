@@ -44,7 +44,7 @@ void AWebRequest_Mc_Lf::DownloadAppVersion() const
 	{
 		if (bWasSuccessful && Response.IsValid())
 		{
-			const int32& StatusCode = Response->GetResponseCode();
+			const int32 StatusCode = Response->GetResponseCode();
 			const FString& Content = Response->GetContentAsString();
 
 			const FString& ProjectVersion = ADataTranslate_Mc_Lf::GetAppVersion();

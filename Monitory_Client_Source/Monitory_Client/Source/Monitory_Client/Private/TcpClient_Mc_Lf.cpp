@@ -18,7 +18,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	const int32& NumAddresses = ADataTranslate_Mc_Lf::IPAddresses.Num();
+	const int32 NumAddresses = ADataTranslate_Mc_Lf::IPAddresses.Num();
 	if (NumAddresses < TcpSockets.Num())
 	{
 		for (FTcpClient_Socket_Mc_Lf& Socket : TcpSockets)

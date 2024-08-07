@@ -24,7 +24,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Set3DWorldEnabled(const bool& bEnabled) const;
+	void Set3DWorldEnabled(bool bEnabled) const;
 
-	void SetShowMouseEnabled(const bool& bEnabled) const;
+	void SetShowMouseEnabled(bool bEnabled) const;
 };

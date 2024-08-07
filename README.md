@@ -26,4 +26,4 @@
 
 ## Development:
  - Server Applications are writtent in c# .NET, open the solution and build it
- - Client Application is written in Unreal Engine 5 C++, you need to have UE5.2 Installed and you need to own a copy of [UMG Spline](https://www.unrealengine.com/marketplace/en-US/product/umgspline?sessionInvalidated=true) and install it to the Engine
+ - Client Application is written in Unreal Engine 5 C++, you need to have UE 5.4.3 Installed and you need to own a copy of [UMG Spline](https://www.unrealengine.com/marketplace/en-US/product/umgspline) to install it to the Engine, In future I probably will replace UMG Spline with my own implmentation to stay independent...

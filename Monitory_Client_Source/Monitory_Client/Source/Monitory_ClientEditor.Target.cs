@@ -8,8 +8,9 @@ public class Monitory_ClientEditorTarget : TargetRules
 	public Monitory_ClientEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
+		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_4;
+		// bOverrideBuildEnvironment = true;
 		ExtraModuleNames.Add("Monitory_Client");
 	}
 }

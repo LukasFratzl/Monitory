@@ -3,18 +3,15 @@
 
 #pragma once
 
-#include "Networking.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Sockets.h"
 #include "Tasks/Task.h"
 #include "TcpClient_Mc_Lf.generated.h"
 
-USTRUCT()
-struct MONITORY_CLIENT_API FTcpClient_Socket_Mc_Lf
-{
-	GENERATED_BODY()
 
+struct FTcpClient_Socket_Mc_Lf
+{
 	FSocket* Socket = nullptr;
 
 	int32 RetryConnection = 0;
