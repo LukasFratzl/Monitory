@@ -7,8 +7,34 @@ using LibreHardwareMonitor.Hardware;
 
 namespace Monitory_Server_Windows
 {
+	class ScheduledTask
+	{
+		internal readonly Action Action;
+		internal System.Timers.Timer Timer;
+		internal EventHandler TaskComplete;
+
+		public ScheduledTask(Action action, int timeoutMs)
+		{
+			Action = action;
+			Timer = new System.Timers.Timer() { Interval = timeoutMs };
+			Timer.Elapsed += TimerElapsed;
+		}
+
+		private void TimerElapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			Timer.Stop();
+			Timer.Elapsed -= TimerElapsed;
+			Timer = null;
+
+			Action();
+			TaskComplete(this, EventArgs.Empty);
+		}
+	}
+
 	class Program
 	{
+		private static List<ScheduledTask> _scheduledTasks = new List<ScheduledTask>();
+
 		private const string TotalName = "total";
 		private const string CoreName = "core";
 		private const string ThreadName = "thread";
@@ -55,7 +81,7 @@ namespace Monitory_Server_Windows
 			{
 				try
 				{
-					MainLoop(bInit);
+					_scheduledTasks = MainLoop(bInit);
 					bInit = false;
 				}
 				catch (Exception e)
@@ -112,7 +138,7 @@ namespace Monitory_Server_Windows
 
 		}
 
-		static void MainLoop(bool bIsInit)
+		static List<ScheduledTask> MainLoop(bool bIsInit)
 		{
 			_computer = new Computer
 			{
@@ -124,6 +150,8 @@ namespace Monitory_Server_Windows
 				IsNetworkEnabled = true,
 				IsStorageEnabled = true
 			};
+
+			var tasks = new List<ScheduledTask>();
 
 			_computer.Open();
 			_computer.Accept(new UpdateVisitor());
@@ -159,7 +187,17 @@ namespace Monitory_Server_Windows
 			{
 				try
 				{
-					RunW32tmResync();
+					var syncTimer1 = new ScheduledTask(() => RunW32tmResync(), 120000);
+					tasks.Add(syncTimer1);
+					syncTimer1.Timer.Start();
+
+					var syncTimer2 = new ScheduledTask(() => RunW32tmResync(), 600000);
+					tasks.Add(syncTimer2);
+					syncTimer2.Timer.Start();
+
+					var syncTimer3 = new ScheduledTask(() => RunW32tmResync(), 1200000);
+					tasks.Add(syncTimer3);
+					syncTimer3.Timer.Start();
 				}
 				catch (Exception e)
 				{
@@ -186,6 +224,8 @@ namespace Monitory_Server_Windows
 			Console.WriteLine("Exiting the program.");
 
 			_computer.Close();
+
+			return tasks;
 		}
 
 		static string CollectData()
