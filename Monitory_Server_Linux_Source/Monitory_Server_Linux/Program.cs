@@ -15,6 +15,10 @@ namespace Monitory_Server_Linux
         private static string _lastNetworkUtilString = "";
         private static bool _networkInfoThreadRunning;
 
+        private static bool _turbostatCommandRunning;
+        private static float _currentCpuWatt = 0.0f;
+        private static float _currentCpuTemp = 0.0f;
+
         private readonly TcpListener _server = new TcpListener(IPAddress.Any, 54000);
 
         static void Main()
@@ -27,6 +31,38 @@ namespace Monitory_Server_Linux
 
             while (!bNeedExit)
             {
+                try
+                {
+                    if (!_turbostatCommandRunning)
+                    {
+                        _turbostatCommandRunning = true;
+                        Thread thread = new Thread(() =>
+                        {
+                            try
+                            {
+                                string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
+                                string command =
+                                    "sudo turbostat --quiet  --num_iterations=1    --interval=0.5     --out=" +
+                                    AddQuote() + file + AddQuote();
+                                _lastCpuUtilString =
+                                    RunCommand("bash", "-c " + AddQuote() + command + AddQuote(), true);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
+
+                            _turbostatCommandRunning = false;
+                        });
+                        thread.Start();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+
                 try
                 {
                     if (!_cpuUtilThreadRunning)
@@ -152,6 +188,11 @@ namespace Monitory_Server_Linux
             }
         }
 
+        public static string AddQuote()
+        {
+            return "\"";
+        }
+
 
         static string CollectData()
         {
@@ -178,9 +219,9 @@ namespace Monitory_Server_Linux
             return data;
         }
 
-        static string RunCommand(string command, string arguments)
+        static string RunCommand(string command, string arguments, bool useShell = false)
         {
-            string output;
+            string output = "";
 
             try
             {
@@ -440,21 +481,70 @@ namespace Monitory_Server_Linux
         {
             string name = RunCommand("bash",
                 "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
-            //string wattageString = RunCommand("turbostat", "--show PkgWatt 1 1");
-            // string tempString = RunCommand("bash", "-c \"sudo turbostat --quiet --show PkgTmp 1 1\"");
+            string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
+            // string wattageString = RunCommand("bash", $"-c \"cat \"{file}\"");
+            // string tempString = RunSudoCommand("bash", "-c \"sudo turbostat --quiet --show PkgTmp 1 1\"");
 
-            //Console.WriteLine(wattageString);
+            float pkgTmp = 0.0f;
+            float pkgWatt = 0.0f;
 
-            //string[] wattage = wattageString.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-            // string[] temp = tempString.Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+            string[] stat_file = File.ReadAllLines(file);
+            for (int i = stat_file.Length - 1; i >= 0; i--)
+            {
+                if (stat_file[i].Contains("PkgTmp") && stat_file[i].Contains("PkgWatt"))
+                {
+                    string[] info_lines = stat_file[i].Trim()
+                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] data_lines = stat_file[i + 1].Trim()
+                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                    for (int item = info_lines.Length - 1; item >= 0; item--)
+                    {
+                        if (info_lines[item] == "PkgTmp")
+                        {
+                            float tmp = 0.0f;
+                            float.TryParse(data_lines[item].Replace(',', '.'), out tmp);
+                            if (tmp == 0.0f)
+                            {
+                                pkgTmp = _currentCpuTemp;
+                            }
+                            else
+                            {
+                                pkgTmp = tmp;
+                                _currentCpuTemp = tmp;
+                            }
+                        }
 
-            //Console.WriteLine(wattage.Length);
-            //Console.WriteLine("This is the String ->" + wattageString);
+                        if (info_lines[item] == "PkgWatt")
+                        {
+                            float watt = 0.0f;
+                            float.TryParse(data_lines[item].Replace(',', '.'), out watt);
+                            if (watt == 0.0f)
+                            {
+                                pkgWatt = _currentCpuWatt;
+                            }
+                            else
+                            {
+                                pkgWatt = watt;
+                                _currentCpuWatt = watt;
+                            }
+                        }
+                    }
 
-            // TODO:
+                    break;
+                }
+            }
 
-            properties += $"Wattage:{name}:0:0:100|";
-            properties += $"Temperature:{name}::0:0:100|";
+            if (pkgTmp == 0.0f)
+            {
+                pkgTmp = _currentCpuTemp;
+            }
+            if (pkgWatt == 0.0f)
+            {
+                pkgWatt = _currentCpuWatt;
+            }
+
+            properties += $"Wattage:{name}:{pkgWatt}:0:100|";
+            properties += $"Temperature:{name}:{pkgTmp}:0:100|";
         }
 
         public static void CollectGpuData(ref string properties)
