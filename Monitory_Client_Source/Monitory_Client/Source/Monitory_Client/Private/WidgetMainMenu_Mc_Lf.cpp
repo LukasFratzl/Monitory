@@ -2,9 +2,7 @@
 
 
 #include "Monitory_Client/Public/WidgetMainMenu_Mc_Lf.h"
-
 #include "DataTranslate_Mc_Lf.h"
-//#include "OpenGLDrv.h"
 #include "TcpClient_Mc_Lf.h"
 #include "WidgetIPAddress_Mc_Lf.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
@@ -420,11 +418,11 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
                                       const TObjectPtr<UCanvasPanel> CanvasPanel) const
 {
 	const FGeometry& Geometry = CanvasPanel->GetCachedGeometry();
-	const FVector2D& CanvasPanelSize = USlateBlueprintLibrary::GetLocalSize(Geometry);
+	const FVector2f& CanvasPanelSize = FVector2f(USlateBlueprintLibrary::GetLocalSize(Geometry));
 
 	if (!IsValid(Graph.FillArea.FillWidget) && IsValid(GraphCollectionCanvasPanel))
 	{
-		Graph.FillArea.FillWidget = WidgetTree->ConstructWidget<UGraphFillWidget_Mc_Lf>();
+		Graph.FillArea.FillWidget = WidgetTree->ConstructWidget<UWidgetGraphFill_Mc_Lf>();
 		CanvasPanel->AddChildToCanvas(Graph.FillArea.FillWidget);
 		Cast<UCanvasPanelSlot>(Graph.FillArea.FillWidget->Slot)->SetZOrder(1);
 		if (IsValid(Graph.FillMaterialOverride))
@@ -441,33 +439,35 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 
 	if (!IsValid(Graph.HighLine.Line))
 	{
-		Graph.HighLine.Line = WidgetTree->ConstructWidget<USplineWidget>();
+		Graph.HighLine.Line = WidgetTree->ConstructWidget<UWidgetGraphLine_Mc_Lf>();
 		CanvasPanel->AddChildToCanvas(Graph.HighLine.Line);
 		Cast<UCanvasPanelSlot>(Graph.HighLine.Line->Slot)->SetZOrder(3);
-		Graph.HighLine.Line->SplineInfo.CustomVertsBrush.SetResourceObject(GraphLinesMaterial);
-		Graph.HighLine.Line->SplineInfo.CustomVertsBrush.TintColor = Graph.SeparatorLineColor;
+		Graph.HighLine.Line->Brush.SetResourceObject(GraphLinesMaterial);
+		Graph.HighLine.Line->Brush.TintColor = Graph.SeparatorLineColor;
+		Graph.HighLine.Line->SynchronizeProperties();
 	}
 
-	Graph.HighLine.Line->RemoveAllSplinePoint(true);
-	Graph.HighLine.Line->AddSplinePoint(FUMGSplinePoint(FVector2D::ZeroVector, FVector2D::ZeroVector), true);
-	Graph.HighLine.Line->AddSplinePoint(FUMGSplinePoint(FVector2D(CanvasPanelSize.X, 0), FVector2D::ZeroVector), true);
-	Graph.HighLine.Line->SetSplineType(EUMGSplineType::Linear);
-	Graph.HighLine.Line->UpdateSpline();
+	TArray<FVector2f> HighLinePoints;
+	HighLinePoints.Add(FVector2f::ZeroVector);
+	HighLinePoints.Add(FVector2f(CanvasPanelSize.X, 0));
+	Graph.HighLine.Line->SetLinePoints(HighLinePoints);
+	Graph.HighLine.Line->SetParentPanelSize(CanvasPanelSize);
 
 	if (!IsValid(Graph.LowLine.Line))
 	{
-		Graph.LowLine.Line = WidgetTree->ConstructWidget<USplineWidget>();
+		Graph.LowLine.Line = WidgetTree->ConstructWidget<UWidgetGraphLine_Mc_Lf>();
 		CanvasPanel->AddChildToCanvas(Graph.LowLine.Line);
 		Cast<UCanvasPanelSlot>(Graph.LowLine.Line->Slot)->SetZOrder(3);
-		Graph.LowLine.Line->SplineInfo.CustomVertsBrush.SetResourceObject(GraphLinesMaterial);
-		Graph.LowLine.Line->SplineInfo.CustomVertsBrush.TintColor = Graph.SeparatorLineColor;
+		Graph.LowLine.Line->Brush.SetResourceObject(GraphLinesMaterial);
+		Graph.LowLine.Line->Brush.TintColor = Graph.SeparatorLineColor;
+		Graph.LowLine.Line->SynchronizeProperties();
 	}
 
-	Graph.LowLine.Line->RemoveAllSplinePoint(true);
-	Graph.LowLine.Line->AddSplinePoint(FUMGSplinePoint(FVector2D(0, CanvasPanelSize.Y), FVector2D::ZeroVector), true);
-	Graph.LowLine.Line->AddSplinePoint(FUMGSplinePoint(CanvasPanelSize, FVector2D::ZeroVector), true);
-	Graph.LowLine.Line->SetSplineType(EUMGSplineType::Linear);
-	Graph.HighLine.Line->UpdateSpline();
+	TArray<FVector2f> LowLinePoints;
+	LowLinePoints.Add(FVector2f(0, CanvasPanelSize.Y));
+	LowLinePoints.Add(CanvasPanelSize);
+	Graph.LowLine.Line->SetLinePoints(LowLinePoints);
+	Graph.LowLine.Line->SetParentPanelSize(CanvasPanelSize);
 
 	Graph.CurrentCanvasSize = CanvasPanelSize;
 
@@ -487,25 +487,26 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 		{
 			FShapedLine_Mc_Lf& Line = Graph.Graph[i];
 
-			Line.Line = WidgetTree->ConstructWidget<USplineWidget>();
+			Line.Line = WidgetTree->ConstructWidget<UWidgetGraphLine_Mc_Lf>();
 			CanvasPanel->AddChildToCanvas(Line.Line);
 			Cast<UCanvasPanelSlot>(Line.Line->Slot)->SetZOrder(2);
 
-			Line.Line->SetSplineType(EUMGSplineType::Linear); // Might give it as option
-			Line.Line->SplineInfo.CustomVertsBrush.SetResourceObject(GraphLinesMaterial);
+			Line.Line->SetParentPanelSize(CanvasPanelSize);
+			Line.Line->Brush.SetResourceObject(GraphLinesMaterial);
 
-			Line.Line->RemoveAllSplinePoint(true);
 			Line.ValueHistory.Empty();
+			TArray<FVector2f> Points;
+			Points.SetNum(NumPoints);
 
 			for (int32 p = 0; p < NumPoints; ++p)
 			{
-				FVector2D Location = Graph.CurrentCanvasSize;
+				FVector2f Location = Graph.CurrentCanvasSize;
 				Location.X *= (static_cast<double>(p) / static_cast<double>(NumLines - 1));
-				Line.Line->AddSplinePoint(FUMGSplinePoint(Location, FVector2D::ZeroVector), true);
+				Points[p] = Location;
 				Line.ValueHistory.Add(0.01);
 			}
 
-			Line.Line->UpdateSpline();
+			Line.Line->SetLinePoints(Points);
 		}
 	}
 }
@@ -628,7 +629,7 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 	double MaxValuePerUnit = 0;
 	double MaxValue = 0;
 	const int32 NumGraphLines = Graph.Graph.Num();
-	const int32 FullNumPoints = Graph.Graph[0].Line->GetNumberOfSplinePoints();
+	const int32 FullNumPoints = Graph.Graph[0].Line->GetNumLinePoints();
 	for (int32 p = 1; p < FullNumPoints; ++p)
 	{
 		double MaxPointValue = 0;
@@ -668,26 +669,25 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 	{
 		FShapedLine_Mc_Lf& Line = Graph.Graph[i];
 
-		Line.Line->RemoveSplinePoint(0, true);
+		TArray<FVector2f> Points;
+		Points.AddUninitialized(FullNumPoints);
 		Line.ValueHistory.RemoveAt(0);
 
-		const int32 PointMaxIndex = Graph.Graph[i].Line->GetNumberOfSplinePoints();
+		const int32 PointMaxIndex = FullNumPoints - 1;
 
 		for (int32 p = 0; p < PointMaxIndex; ++p)
 		{
-			FVector2D Location = Line.Line->GetLocationAtSplinePoint(p, EUMGSplineCoordinateSpace::Local);
+			FVector2f Location = Line.Line->GetLinePointPosition(p + 1);
 			Location.X = Graph.CurrentCanvasSize.X * (static_cast<double>(p) / static_cast<double>(FullNumPoints - 1));
 			if (bIsRelativeGraph)
 			{
 				const double Percentage = Line.ValueHistory[p] / MaxValuePerUnit;
 				Location.Y = Graph.CurrentCanvasSize.Y - Graph.CurrentCanvasSize.Y * Percentage * 0.75f; // 0.75f for better view
 			}
-			Line.Line->ChangeSplinePointAtIndex(FUMGSplinePoint(Location, FVector2D::ZeroVector), p, true);
-
-			//UE_LOG(LogTemp, Warning, TEXT("Loc Old Points -> %s"), *Location.ToString());
+			Points[p] = Location;
 		}
 
-		FVector2D LastPointLocation = Graph.CurrentCanvasSize;
+		FVector2f LastPointLocation = Graph.CurrentCanvasSize;
 		if (bIsRelativeGraph)
 		{
 			const double Percentage = Data[i].Current / MaxValuePerUnit;
@@ -697,41 +697,30 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 		{
 			LastPointLocation.Y -= LastPointLocation.Y * Data[i].Current * 0.01f;
 		}
-		Line.Line->AddSplinePoint(FUMGSplinePoint(LastPointLocation, FVector2D::ZeroVector), true);
+		Points.Last() = LastPointLocation;
 		Line.ValueHistory.Add(Data[i].Current);
 
 		if (Graph.bUseLineColorOverride)
 		{
-			Line.Line->SplineInfo.TintColor = Graph.LineColorOverride;
+			Line.Line->Brush.TintColor = Graph.LineColorOverride;
 		}
 		else
 		{
-			Line.Line->SplineInfo.TintColor = Data[i].Color;
+			Line.Line->Brush.TintColor = Data[i].Color;
 		}
-		Line.Line->UpdateSpline();
-
-		//UE_LOG(LogTemp, Warning, TEXT("Loc New Point -> %s"), *LastPointLocation.ToString());
-
-		//FVector2D LocationTest = Line.Line->GetLocationAtSplinePoint(NumPoints, EUMGSplineCoordinateSpace::Local);
-
-		//UE_LOG(LogTemp, Warning, TEXT("Loc Removed Point -> %s"), *LocationTest.ToString());
+		Line.Line->SetParentPanelSize(Graph.CurrentCanvasSize);
+		Line.Line->SetLinePoints(Points);
 	}
 
 
 	// Handle Fill Areas
 	if (IsValid(Graph.FillArea.FillWidget))
 	{
-		// const FGeometry& Geometry = CanvasPanel->GetCachedGeometry();
-		// FVector2D PixelPosition;
-		// FVector2D ViewportPositionCanvas;
-		// USlateBlueprintLibrary::LocalToViewport(GetWorld(), Geometry,
-		//                                         Cast<UHorizontalBoxSlot>(CanvasPanel->Slot)->GetPadding().GetTopLeft(), PixelPosition,
-		//                                         ViewportPositionCanvas);
 		TArray<FVector2f> FillPoints;
 		for (int32 p = 1; p < FullNumPoints; ++p)
 		{
 			double MaxPointValue = 0;
-			FVector2D BestPoint = FVector2D::ZeroVector;
+			FVector2f BestPoint = FVector2f(0, 1); // 1 Up because of the intersection to ground line
 
 			for (int32 i = 0; i < NumGraphLines; ++i)
 			{
@@ -739,15 +728,19 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 				if (Line.ValueHistory[p] >= MaxPointValue)
 				{
 					MaxPointValue = Line.ValueHistory[p];
-					BestPoint = Line.Line->GetLocationAtSplinePoint(p, EUMGSplineCoordinateSpace::Local);
+					BestPoint = Line.Line->GetLinePointPosition(p);
+					if (BestPoint.Y == Graph.CurrentCanvasSize.Y)
+					{
+						BestPoint.Y = Graph.CurrentCanvasSize.Y - 1;
+					}
 				}
 			}
 
-			FillPoints.Add(FVector2f(BestPoint));
+			FillPoints.Add(BestPoint);
 		}
 		Graph.FillArea.FillWidget->Brush.TintColor = Graph.FillColor;
 
-		FillPoints.Add(FVector2f(Graph.CurrentCanvasSize));
+		FillPoints.Add(Graph.CurrentCanvasSize);
 		FillPoints.Add(FVector2f(0, Graph.CurrentCanvasSize.Y));
 
 		Graph.FillArea.FillWidget->SetParentPanelSize(Graph.CurrentCanvasSize);

@@ -1,4 +1,8 @@
-#include "SGraphFillWidget_Mc_Lf.h"
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "WidgetFillGraph_Mc_Lf.h"
+
 #include "SlateOptMacros.h"
 #include "CompGeom/PolygonTriangulation.h"
 
@@ -45,12 +49,14 @@ int32 SGraphFillWidget_Mc_Lf::OnPaint(const FPaintArgs& Args, const FGeometry& A
 		Vertices.Add(Vertex);
 	}
 
+	const int32 NumTriangles = Triangles.Num();
 	TArray<SlateIndex> Indices;
-	for (int32 Index = 0; Index < Triangles.Num(); Index++)
+	Indices.SetNumUninitialized(NumTriangles * 3);
+	for (int32 Index = 0; Index < NumTriangles; Index++)
 	{
-		Indices.Add(Triangles[Index].A);
-		Indices.Add(Triangles[Index].B);
-		Indices.Add(Triangles[Index].C);
+		Indices[Index * 3 + 0] = Triangles[Index].A;
+		Indices[Index * 3 + 1] = Triangles[Index].B;
+		Indices[Index * 3 + 2] = Triangles[Index].C;
 	}
 
 
@@ -71,5 +77,32 @@ int32 SGraphFillWidget_Mc_Lf::OnPaint(const FPaintArgs& Args, const FGeometry& A
 void SGraphFillWidget_Mc_Lf::SetBrush(FSlateBrush* InBrush)
 {
 	Brush.SetImage(*this, InBrush);
+}
+
+#define LOCTEXT_NAMESPACE "UMG"
+
+void UWidgetGraphFill_Mc_Lf::SynchronizeProperties()
+{
+	Super::SynchronizeProperties();
+	GraphFillSlateWidget->SetBrush(&Brush);
+}
+
+void UWidgetGraphFill_Mc_Lf::ReleaseSlateResources(bool bReleaseChildren)
+{
+	GraphFillSlateWidget.Reset();
+}
+
+#if WITH_EDITOR
+const FText UWidgetGraphFill_Mc_Lf::GetPaletteCategory()
+{
+	return LOCTEXT("Monitory Client", "Monitoring App Custom Widget");
+}
+#endif
+
+TSharedRef<SWidget> UWidgetGraphFill_Mc_Lf::RebuildWidget()
+{
+	GraphFillSlateWidget = SNew(SGraphFillWidget_Mc_Lf)
+		.Brush(&Brush);
+	return GraphFillSlateWidget.ToSharedRef();
 }
 

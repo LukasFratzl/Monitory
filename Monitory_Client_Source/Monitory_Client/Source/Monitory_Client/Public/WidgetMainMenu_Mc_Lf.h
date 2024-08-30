@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "DataTranslate_Mc_Lf.h"
-#include "GraphFillWidget_Mc_Lf.h"
 #include "MediaSource.h"
-#include "SplineWidget.h"
+#include "WidgetFillGraph_Mc_Lf.h"
 #include "WidgetHardwareLabel_Mc_Lf.h"
+#include "WidgetLineGraph_Mc_Lf.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
@@ -32,7 +32,7 @@ struct MONITORY_CLIENT_API FLine_Mc_Lf
 	}
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USplineWidget> Line;
+	TObjectPtr<UWidgetGraphLine_Mc_Lf> Line;
 };
 
 USTRUCT()
@@ -83,7 +83,7 @@ struct MONITORY_CLIENT_API FFilledGraphArea_Mc_Lf
 	}
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UGraphFillWidget_Mc_Lf> FillWidget;
+	TObjectPtr<UWidgetGraphFill_Mc_Lf> FillWidget;
 
 	// UPROPERTY(EditAnywhere)
 	// TArray<double> ValueHistory;
@@ -133,7 +133,7 @@ struct MONITORY_CLIENT_API FGraph_Mc_Lf
 	FFilledGraphArea_Mc_Lf FillArea;
 
 	UPROPERTY(EditAnywhere)
-	FVector2D CurrentCanvasSize = FVector2D::ZeroVector;
+	FVector2f CurrentCanvasSize = FVector2f::ZeroVector;
 };
 
 UENUM()
