@@ -443,7 +443,7 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 		CanvasPanel->AddChildToCanvas(Graph.HighLine.Line);
 		Cast<UCanvasPanelSlot>(Graph.HighLine.Line->Slot)->SetZOrder(3);
 		Graph.HighLine.Line->Brush.SetResourceObject(GraphLinesMaterial);
-		Graph.HighLine.Line->Brush.TintColor = Graph.SeparatorLineColor;
+		Graph.HighLine.Line->Brush.TintColor = Graph.HighLineColor;
 		Graph.HighLine.Line->SynchronizeProperties();
 	}
 
@@ -459,7 +459,7 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 		CanvasPanel->AddChildToCanvas(Graph.LowLine.Line);
 		Cast<UCanvasPanelSlot>(Graph.LowLine.Line->Slot)->SetZOrder(3);
 		Graph.LowLine.Line->Brush.SetResourceObject(GraphLinesMaterial);
-		Graph.LowLine.Line->Brush.TintColor = Graph.SeparatorLineColor;
+		Graph.LowLine.Line->Brush.TintColor = Graph.LowLineColor;
 		Graph.LowLine.Line->SynchronizeProperties();
 	}
 

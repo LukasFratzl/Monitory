@@ -115,7 +115,10 @@ struct MONITORY_CLIENT_API FGraph_Mc_Lf
 	FLinearColor LineColorOverride = FLinearColor::White;
 
 	UPROPERTY(EditAnywhere)
-	FLinearColor SeparatorLineColor = FLinearColor::White;
+	FLinearColor HighLineColor = FLinearColor::Transparent;
+
+	UPROPERTY(EditAnywhere)
+	FLinearColor LowLineColor = FLinearColor::White;
 
 	UPROPERTY(EditAnywhere)
 	TArray<FShapedLine_Mc_Lf> Graph;

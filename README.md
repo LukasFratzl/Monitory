@@ -25,5 +25,5 @@
  - White List the Server IP, you can have multiple Servers and it should connect with the Server
 
 ## Development:
- - Server Applications are writtent in c# .NET, open the solution and build it
- - Client Application is written in Unreal Engine 5 C++, you need to have UE 5.4.3 Installed and you need to own a copy of [UMG Spline](https://www.unrealengine.com/marketplace/en-US/product/umgspline) to install it to the Engine, In future I probably will replace UMG Spline with my own implmentation to stay independent...
+ - Server Applications are written in c# .NET, open the solution and build it
+ - Client Application is written in Unreal Engine 5 C++, you need to have UE 5.4.4 Installed, it works with native UE5, you don't need any plugins installed
