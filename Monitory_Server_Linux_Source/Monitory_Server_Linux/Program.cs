@@ -42,7 +42,7 @@ namespace Monitory_Server_Linux
                             {
                                 string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
                                 string command =
-                                    "sudo turbostat --quiet  --num_iterations=1    --interval=0.5     --out=" +
+                                    "turbostat --quiet  --num_iterations=1    --interval=0.5     --out=" +
                                     AddQuote() + file + AddQuote();
                                 _lastCpuUtilString =
                                     RunCommand("bash", "-c " + AddQuote() + command + AddQuote(), true);
