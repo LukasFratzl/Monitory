@@ -41,8 +41,18 @@ namespace Monitory_Server_Linux
                             try
                             {
                                 string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
+                                try
+                                {
+                                    File.Delete(file);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+                                }
+
+                                Console.WriteLine("Stats File at: " + file);
                                 string command =
-                                    "turbostat --quiet  --num_iterations=1    --interval=0.5     --out=" +
+                                    "turbostat --quiet --interval=1 --Summary --show Busy%,PkgWatt,PkgTmp -out=" +
                                     AddQuote() + file + AddQuote();
                                 _lastCpuUtilString =
                                     RunCommand("bash", "-c " + AddQuote() + command + AddQuote(), true);
@@ -123,6 +133,11 @@ namespace Monitory_Server_Linux
                     }
 
                     _dataToSend = CollectData();
+
+                    // string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
+                    // // echo "$(tail -n 10 test.log)" > test.log
+                    // string command = "echo \"$(tail -n 10 '" + file + "')\" > '" + file + "' ";
+                    // RunCommand("bash", "-c \"" + command + "\"", true);
                 }
                 catch (Exception e)
                 {
@@ -489,48 +504,33 @@ namespace Monitory_Server_Linux
             float pkgWatt = 0.0f;
 
             string[] stat_file = File.ReadAllLines(file);
-            for (int i = stat_file.Length - 1; i >= 0; i--)
+            if (stat_file.Length > 0)
             {
-                if (stat_file[i].Contains("PkgTmp") && stat_file[i].Contains("PkgWatt"))
+                string[] info_lines = stat_file.Last().Trim()
+                    .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                float tmp = 0.0f;
+                float.TryParse(info_lines[1].Replace(',', '.'), out tmp);
+                if (tmp == 0.0f)
                 {
-                    string[] info_lines = stat_file[i].Trim()
-                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    string[] data_lines = stat_file[i + 1].Trim()
-                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                    for (int item = info_lines.Length - 1; item >= 0; item--)
-                    {
-                        if (info_lines[item] == "PkgTmp")
-                        {
-                            float tmp = 0.0f;
-                            float.TryParse(data_lines[item].Replace(',', '.'), out tmp);
-                            if (tmp == 0.0f)
-                            {
-                                pkgTmp = _currentCpuTemp;
-                            }
-                            else
-                            {
-                                pkgTmp = tmp;
-                                _currentCpuTemp = tmp;
-                            }
-                        }
+                    pkgTmp = _currentCpuTemp;
+                }
+                else
+                {
+                    pkgTmp = tmp;
+                    _currentCpuTemp = tmp;
+                }
 
-                        if (info_lines[item] == "PkgWatt")
-                        {
-                            float watt = 0.0f;
-                            float.TryParse(data_lines[item].Replace(',', '.'), out watt);
-                            if (watt == 0.0f)
-                            {
-                                pkgWatt = _currentCpuWatt;
-                            }
-                            else
-                            {
-                                pkgWatt = watt;
-                                _currentCpuWatt = watt;
-                            }
-                        }
-                    }
-
-                    break;
+                float watt = 0.0f;
+                float.TryParse(info_lines[2].Replace(',', '.'), out watt);
+                if (watt == 0.0f)
+                {
+                    pkgWatt = _currentCpuWatt;
+                }
+                else
+                {
+                    pkgWatt = watt;
+                    _currentCpuWatt = watt;
                 }
             }
 
@@ -538,6 +538,7 @@ namespace Monitory_Server_Linux
             {
                 pkgTmp = _currentCpuTemp;
             }
+
             if (pkgWatt == 0.0f)
             {
                 pkgWatt = _currentCpuWatt;
