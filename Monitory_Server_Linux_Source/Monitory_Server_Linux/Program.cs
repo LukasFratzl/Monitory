@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -20,10 +21,43 @@ namespace Monitory_Server_Linux
         private static float _currentCpuTemp = 0.0f;
 
         private readonly TcpListener _server = new TcpListener(IPAddress.Any, 54000);
+        private static Dictionary<Commands, string> _commands = new Dictionary<Commands, string>();
+
+        public enum Commands
+        {
+            CPU_MHZ_STR,
+            RAM_STR,
+            CPU_NAME,
+            GPU_NAME,
+            GPU_UTIL,
+            GPU_CLOCK,
+            GPU_FREE_MEM,
+            GPU_USED_MEM,
+            GPU_TEMP,
+            GPU_WATT
+        }
 
         static void Main()
         {
             Console.WriteLine("Thanks a lot for coming that far...");
+
+            _commands.Clear();
+            _commands.Add(Commands.CPU_MHZ_STR, "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
+            _commands.Add(Commands.RAM_STR, "-c \"free -m | awk '/^Mem/ {print $2/1000 \\\"\\n\\\" $3/1000}'\"");
+            _commands.Add(Commands.CPU_NAME,
+                "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
+            _commands.Add(Commands.GPU_NAME, "-c \"nvidia-smi --query-gpu=name --format=csv,noheader\"");
+            _commands.Add(Commands.GPU_UTIL,
+                "-c \"nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits\"");
+            _commands.Add(Commands.GPU_CLOCK,
+                "-c \"nvidia-smi --query-gpu=clocks.gr --format=csv,noheader,nounits\"");
+            _commands.Add(Commands.GPU_FREE_MEM,
+                "-c \"nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits\"");
+            _commands.Add(Commands.GPU_USED_MEM,
+                "-c \"nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits\"");
+            _commands.Add(Commands.GPU_TEMP, "-c \"nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader\"");
+            _commands.Add(Commands.GPU_WATT, "-c \"nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits\"");
+            
 
             bool bNeedExit = false;
             Program main = new Program();
@@ -132,7 +166,8 @@ namespace Monitory_Server_Linux
                         thread.Start();
                     }
 
-                    _dataToSend = CollectData();
+                    ConcurrentDictionary<Commands, string> _commandsOutput = GetSystemData(_commands);
+                    _dataToSend = CollectData(_commandsOutput);
 
                     // string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
                     // // echo "$(tail -n 10 test.log)" > test.log
@@ -208,8 +243,28 @@ namespace Monitory_Server_Linux
             return "\"";
         }
 
+        static ConcurrentDictionary<Commands, string> GetSystemData(Dictionary<Commands, string> commands)
+        {
 
-        static string CollectData()
+            var array = commands.ToArray();
+            var commandOutput = new ConcurrentDictionary<Commands, string>();
+            Parallel.ForEach(array, i =>
+            {
+                try
+                {
+                    string output = RunCommand("bash", i.Value);
+                    commandOutput.TryAdd(i.Key, output);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            });
+            return commandOutput;
+        }
+
+
+        static string CollectData(ConcurrentDictionary<Commands, string> CommandsOutput)
         {
             string data = "";
 
@@ -219,17 +274,17 @@ namespace Monitory_Server_Linux
             string dateNow = $"Date_Now:{DateTime.Now.ToShortDateString()}:0:0:0|";
             data += dateNow;
 
-            CollectCpuLoadAndClockData(ref data);
+            CollectCpuLoadAndClockData(ref data, CommandsOutput);
 
-            CollectMemoryData(ref data);
+            CollectMemoryData(ref data, CommandsOutput);
 
             CollectStorageData(ref data);
 
             CollectNetworkData(ref data);
 
-            CollectCpuData(ref data);
+            CollectCpuData(ref data, CommandsOutput);
 
-            CollectGpuData(ref data);
+            CollectGpuData(ref data, CommandsOutput);
 
             return data;
         }
@@ -270,7 +325,7 @@ namespace Monitory_Server_Linux
         }
 
 
-        public static void CollectCpuLoadAndClockData(ref string properties)
+        public static void CollectCpuLoadAndClockData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
         {
             // string utilityString = _lastCpuUtilString;//RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
 
@@ -331,7 +386,9 @@ namespace Monitory_Server_Linux
             }
 
 
-            string mhzString = RunCommand("bash", "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
+            // string mhzString = RunCommand("bash", "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
+            string mhzString = "";
+            _commandsOutput.TryGetValue(Commands.CPU_MHZ_STR, out mhzString);
 
             string[] splittedMhzString = mhzString.Split(new[] { Environment.NewLine },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -360,9 +417,12 @@ namespace Monitory_Server_Linux
             properties += cpuClockTotal;
         }
 
-        public static void CollectMemoryData(ref string properties)
+        public static void CollectMemoryData(ref string properties,
+            ConcurrentDictionary<Commands, string> _commandsOutput)
         {
-            string ramString = RunCommand("bash", "-c \"free -m | awk '/^Mem/ {print $2/1000 \\\"\\n\\\" $3/1000}'\"");
+            // string ramString = RunCommand("bash", "-c \"free -m | awk '/^Mem/ {print $2/1000 \\\"\\n\\\" $3/1000}'\"");
+            string ramString = "";
+            _commandsOutput.TryGetValue(Commands.RAM_STR, out ramString);
             // Console.WriteLine(ramString);
 
             string[] splittedRamString = ramString.Split(new[] { Environment.NewLine },
@@ -492,10 +552,12 @@ namespace Monitory_Server_Linux
             }
         }
 
-        public static void CollectCpuData(ref string properties)
+        public static void CollectCpuData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
         {
-            string name = RunCommand("bash",
-                "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
+            // string name = RunCommand("bash",
+            //     "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
+            string name = "";
+            _commandsOutput.TryGetValue(Commands.CPU_NAME, out name);
             string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
             // string wattageString = RunCommand("bash", $"-c \"cat \"{file}\"");
             // string tempString = RunSudoCommand("bash", "-c \"sudo turbostat --quiet --show PkgTmp 1 1\"");
@@ -548,18 +610,32 @@ namespace Monitory_Server_Linux
             properties += $"Temperature:{name}:{pkgTmp}:0:100|";
         }
 
-        public static void CollectGpuData(ref string properties)
+        public static void CollectGpuData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
         {
-            string name = RunCommand("bash", "-c \"nvidia-smi --query-gpu=name --format=csv,noheader\"");
-            string utility = RunCommand("bash",
-                "-c \"nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits\"");
-            string clock = RunCommand("bash", "-c \"nvidia-smi --query-gpu=clocks.gr --format=csv,noheader,nounits\"");
-            string freeMem = RunCommand("bash",
-                "-c \"nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits\"");
-            string usedMem = RunCommand("bash",
-                "-c \"nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits\"");
-            string temp = RunCommand("bash", "-c \"nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader\"");
-            string watt = RunCommand("bash", "-c \"nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits\"");
+            // string name = RunCommand("bash", "-c \"nvidia-smi --query-gpu=name --format=csv,noheader\"");
+            // string utility = RunCommand("bash",
+            //     "-c \"nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits\"");
+            // string clock = RunCommand("bash", "-c \"nvidia-smi --query-gpu=clocks.gr --format=csv,noheader,nounits\"");
+            // string freeMem = RunCommand("bash",
+            //     "-c \"nvidia-smi --query-gpu=memory.free --format=csv,noheader,nounits\"");
+            // string usedMem = RunCommand("bash",
+            //     "-c \"nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits\"");
+            // string temp = RunCommand("bash", "-c \"nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader\"");
+            // string watt = RunCommand("bash", "-c \"nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits\"");
+            string name = "";
+            _commandsOutput.TryGetValue(Commands.GPU_NAME, out name);
+            string utility = "";
+            _commandsOutput.TryGetValue(Commands.GPU_UTIL, out utility);
+            string clock = "";
+            _commandsOutput.TryGetValue(Commands.GPU_CLOCK, out clock);
+            string freeMem = "";
+            _commandsOutput.TryGetValue(Commands.GPU_FREE_MEM, out freeMem);
+            string usedMem = "";
+            _commandsOutput.TryGetValue(Commands.GPU_USED_MEM, out usedMem);
+            string temp = "";
+            _commandsOutput.TryGetValue(Commands.GPU_TEMP, out temp);
+            string watt = "";
+            _commandsOutput.TryGetValue(Commands.GPU_WATT, out watt);
 
             float gpuUtil = 0;
             float.TryParse(utility.Replace(',', '.'), out gpuUtil);
