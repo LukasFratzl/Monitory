@@ -77,19 +77,24 @@ namespace Monitory_Server_Linux
                                 string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
                                 try
                                 {
-                                    File.Delete(file);
+                                    string file1 = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info1.txt");
+                                    string trimCommand =
+                                        $"-c \"tail -n 10 '{file}' > '{file1}' && mv '{file1}' '{file}' --force \"";
+                                    //string trimCmd = $"-c \" echo \"$(tail -n 10 '{file}')\" > '{file}' \"";
+                                    //string trimCommand = "echo \"$(tail -n 10 " + AddQuote() + file + AddQuote() + ") > " + AddQuote() + file + AddQuote();
+                                    RunCommand("bash", trimCommand);
                                 }
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
                                 }
 
-                                Console.WriteLine("Stats File at: " + file);
+                                // Console.WriteLine("Stats File at: " + file);
                                 string command =
-                                    "turbostat --quiet --interval=1 --Summary --show Busy%,PkgWatt,PkgTmp -out=" +
+                                    "turbostat --quiet --interval=1 --num_iterations=100 --Summary --show Busy%,PkgWatt,PkgTmp -out=" +
                                     AddQuote() + file + AddQuote();
                                 _lastCpuUtilString =
-                                    RunCommand("bash", "-c " + AddQuote() + command + AddQuote(), true);
+                                    RunCommand("bash", "-c " + AddQuote() + command + AddQuote());
                             }
                             catch (Exception e)
                             {
@@ -289,7 +294,7 @@ namespace Monitory_Server_Linux
             return data;
         }
 
-        static string RunCommand(string command, string arguments, bool useShell = false)
+        static string RunCommand(string command, string arguments)
         {
             string output = "";
 
