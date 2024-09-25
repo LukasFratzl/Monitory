@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "/home/flow____/.nuget/packages/": {}
+    "/home/lukas/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
+      "projectUniqueName": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
       "projectName": "Monitory_Server_Linux",
-      "projectPath": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
-      "packagesPath": "/home/flow____/.nuget/packages/",
-      "outputPath": "/home/flow____/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/",
+      "projectPath": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
+      "packagesPath": "/home/lukas/.nuget/packages/",
+      "outputPath": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/flow____/.nuget/NuGet/NuGet.Config"
+        "/home/lukas/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"

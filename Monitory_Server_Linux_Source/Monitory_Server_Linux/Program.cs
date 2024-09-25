@@ -576,28 +576,31 @@ namespace Monitory_Server_Linux
                 string[] info_lines = stat_file.Last().Trim()
                     .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-                float tmp = 0.0f;
-                float.TryParse(info_lines[1].Replace(',', '.'), out tmp);
-                if (tmp == 0.0f)
+                if (info_lines.Length >= 3)
                 {
-                    pkgTmp = _currentCpuTemp;
-                }
-                else
-                {
-                    pkgTmp = tmp;
-                    _currentCpuTemp = tmp;
-                }
+                    float tmp = 0.0f;
+                    float.TryParse(info_lines[1].Replace(',', '.'), out tmp);
+                    if (tmp == 0.0f)
+                    {
+                        pkgTmp = _currentCpuTemp;
+                    }
+                    else
+                    {
+                        pkgTmp = tmp;
+                        _currentCpuTemp = tmp;
+                    }
 
-                float watt = 0.0f;
-                float.TryParse(info_lines[2].Replace(',', '.'), out watt);
-                if (watt == 0.0f)
-                {
-                    pkgWatt = _currentCpuWatt;
-                }
-                else
-                {
-                    pkgWatt = watt;
-                    _currentCpuWatt = watt;
+                    float watt = 0.0f;
+                    float.TryParse(info_lines[2].Replace(',', '.'), out watt);
+                    if (watt == 0.0f)
+                    {
+                        pkgWatt = _currentCpuWatt;
+                    }
+                    else
+                    {
+                        pkgWatt = watt;
+                        _currentCpuWatt = watt;
+                    }
                 }
             }
 

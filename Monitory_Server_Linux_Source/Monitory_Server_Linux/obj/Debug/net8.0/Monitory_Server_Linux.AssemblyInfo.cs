@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Monitory_Server_Linux")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5e972aae6f41731065b34f3ed45c39287bfe3c8f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+32853c855cfd9e5fcf304f2b54c12652602cec12")]
 [assembly: System.Reflection.AssemblyProductAttribute("Monitory_Server_Linux")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Monitory_Server_Linux")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
