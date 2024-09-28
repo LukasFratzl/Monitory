@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Monitory_Server_Linux
 {
@@ -592,6 +593,62 @@ namespace Monitory_Server_Linux
 
                     float watt = 0.0f;
                     float.TryParse(info_lines[2].Replace(',', '.'), out watt);
+                    if (watt == 0.0f)
+                    {
+                        pkgWatt = _currentCpuWatt;
+                    }
+                    else
+                    {
+                        pkgWatt = watt;
+                        _currentCpuWatt = watt;
+                    }
+                }
+                else if (info_lines.Length == 2)
+                {
+                    string sensors = RunCommand("bash", "-c \"sensors\"");
+
+                    string[] sensorLines = sensors.Split(new[] { Environment.NewLine },
+                        StringSplitOptions.RemoveEmptyEntries);
+
+                    if (sensorLines.Length > 0)
+                    {
+                        bool found = false;
+                        float tmp = 0.0f;
+                        for (int i = 0; i < sensorLines.Length; i++)
+                        {
+                            if (sensorLines[i].Contains("k10temp"))
+                            {
+                                found = true;
+                            }
+
+                            if (found && (sensorLines[i].ToLower().Contains("tctl") ||
+                                          sensorLines[i].ToLower().Contains("tdie")))
+                            {
+                                string pattern = @"\d+\.\d+";
+                                MatchCollection matches = Regex.Matches(sensorLines[i], pattern);
+
+                                if (matches.Count > 0)
+                                {
+                                    float.TryParse(matches[0].Value.Replace(',', '.'), out tmp);
+                                }
+
+                                break;
+                            }
+                        }
+
+                        if (tmp == 0.0f)
+                        {
+                            pkgTmp = _currentCpuTemp;
+                        }
+                        else
+                        {
+                            pkgTmp = tmp;
+                            _currentCpuTemp = tmp;
+                        }
+                    }
+
+                    float watt = 0.0f;
+                    float.TryParse(info_lines[1].Replace(',', '.'), out watt);
                     if (watt == 0.0f)
                     {
                         pkgWatt = _currentCpuWatt;
