@@ -8,19 +8,19 @@
     "net8.0": []
   },
   "packageFolders": {
-    "/home/lukas/.nuget/packages/": {}
+    "C:\\Users\\Lukas-Work-PC\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
+      "projectUniqueName": "C:\\Users\\Lukas-Work-PC\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\Monitory_Server_Linux.csproj",
       "projectName": "Monitory_Server_Linux",
-      "projectPath": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/Monitory_Server_Linux.csproj",
-      "packagesPath": "/home/lukas/.nuget/packages/",
-      "outputPath": "/home/lukas/Documents/Monitory/Monitory_Server_Linux_Source/Monitory_Server_Linux/obj/",
+      "projectPath": "C:\\Users\\Lukas-Work-PC\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\Monitory_Server_Linux.csproj",
+      "packagesPath": "C:\\Users\\Lukas-Work-PC\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Lukas-Work-PC\\Documents\\Monitory\\Monitory_Server_Linux_Source\\Monitory_Server_Linux\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/lukas/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Lukas-Work-PC\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -38,6 +38,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -59,7 +64,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.108/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.402/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
