@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Management;
 using System.Net;
 using System.Net.Sockets;
 using System.Numerics;
@@ -258,17 +259,21 @@ namespace Monitory_Server_Windows
 
 						if (hardware.HardwareType == HardwareType.Cpu)
 						{
-							CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref clockSpeedTotal, ref properties);
+							CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex,
+								ref properties);
 						}
+
 						CollectMemoryData(sensor, ref properties);
 						CollectGpuData(sensor, ref properties);
 						if (hardware.HardwareType == HardwareType.Storage)
 						{
 							CollectStorageData(sensor, ref properties);
 						}
+
 						if (hardware.HardwareType == HardwareType.Network)
 						{
-							CollectNetworkData(sensor, hardware.Name, ref properties, ref downloadSpeeds, ref uploadSpeeds);
+							CollectNetworkData(sensor, hardware.Name, ref properties, ref downloadSpeeds,
+								ref uploadSpeeds);
 						}
 					}
 				}
@@ -283,16 +288,19 @@ namespace Monitory_Server_Windows
 						CollectPowerData(sensor, hardware.Name, ref watts);
 						CollectTemperatureData(sensor, hardware.Name, ref temps);
 					}
+
 					if (hardware.HardwareType == HardwareType.Cpu)
 					{
-						CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref clockSpeedTotal, ref properties);
+						CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref properties);
 					}
+
 					CollectMemoryData(sensor, ref properties);
 					CollectGpuData(sensor, ref properties);
 					if (hardware.HardwareType == HardwareType.Storage)
 					{
 						CollectStorageData(sensor, ref properties);
 					}
+
 					if (hardware.HardwareType == HardwareType.Network)
 					{
 						CollectNetworkData(sensor, hardware.Name, ref properties, ref downloadSpeeds, ref uploadSpeeds);
@@ -300,7 +308,20 @@ namespace Monitory_Server_Windows
 				}
 			}
 
-			// Capture and write the total CPU load to the file
+			UInt64 multiplier = 0;
+			using (ManagementObject mo = new ManagementObject("Win32_PerfFormattedData_Counters_ProcessorInformation.Name='_Total'"))
+			{
+				multiplier = (UInt64)(mo["PercentProcessorPerformance"]);
+			}
+
+			using (ManagementObject mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
+			{
+				clockSpeedTotal.X = (uint)(mo["MaxClockSpeed"]) * ((float)(multiplier) * 0.01f);
+				clockSpeedTotal.Y = MathF.Min(clockSpeedTotal.X, clockSpeedTotal.Y);
+				clockSpeedTotal.Z = MathF.Max(clockSpeedTotal.X, clockSpeedTotal.Z);
+			}
+
+		// Capture and write the total CPU load to the file
 			string cpuClockTotal = $"Cpu_Clock:Total:{clockSpeedTotal.X}:{clockSpeedTotal.Y}:{clockSpeedTotal.Z}|";
 			properties += cpuClockTotal;
 
@@ -370,7 +391,7 @@ namespace Monitory_Server_Windows
 			//return watts;
 		}
 
-		public static void CollectCpuLoadAndClockData(ISensor sensor, ref int threadLoadIndex, ref int threadClockIndex, ref Vector3 clockSpeedTotal, ref string properties)
+		public static void CollectCpuLoadAndClockData(ISensor sensor, ref int threadLoadIndex, ref int threadClockIndex, ref string properties)
 		{
 			string sensorName = sensor.Name.ToLower();
 			if (sensor.SensorType == SensorType.Load)
@@ -396,32 +417,32 @@ namespace Monitory_Server_Windows
 
 				threadLoadIndex++;
 
-				if (clockSpeedTotal.X <= 0)
-				{
-					clockSpeedTotal.X = sensor.Value.GetValueOrDefault();
-				}
-				else
-				{
-					clockSpeedTotal.X = (clockSpeedTotal.X + sensor.Value.GetValueOrDefault()) / 2;
-				}
-
-				if (clockSpeedTotal.Y <= 0)
-				{
-					clockSpeedTotal.Y = sensor.Min.GetValueOrDefault();
-				}
-				else
-				{
-					clockSpeedTotal.Y = MathF.Min(clockSpeedTotal.Y, sensor.Min.GetValueOrDefault());
-				}
-
-				if (clockSpeedTotal.Z <= 0)
-				{
-					clockSpeedTotal.Z = sensor.Max.GetValueOrDefault();
-				}
-				else
-				{
-					clockSpeedTotal.Z = MathF.Max(clockSpeedTotal.Z, sensor.Max.GetValueOrDefault());
-				}
+				// if (clockSpeedTotal.X <= 0)
+				// {
+				// 	clockSpeedTotal.X = sensor.Value.GetValueOrDefault();
+				// }
+				// else
+				// {
+				// 	clockSpeedTotal.X = (clockSpeedTotal.X + sensor.Value.GetValueOrDefault()) / 2;
+				// }
+				//
+				// if (clockSpeedTotal.Y <= 0)
+				// {
+				// 	clockSpeedTotal.Y = sensor.Min.GetValueOrDefault();
+				// }
+				// else
+				// {
+				// 	clockSpeedTotal.Y = MathF.Min(clockSpeedTotal.Y, sensor.Min.GetValueOrDefault());
+				// }
+				//
+				// if (clockSpeedTotal.Z <= 0)
+				// {
+				// 	clockSpeedTotal.Z = sensor.Max.GetValueOrDefault();
+				// }
+				// else
+				// {
+				// 	clockSpeedTotal.Z = MathF.Max(clockSpeedTotal.Z, sensor.Max.GetValueOrDefault());
+				// }
 			}
 		}
 
