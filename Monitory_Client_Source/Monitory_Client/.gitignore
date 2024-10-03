@@ -52,10 +52,8 @@ Plugins/*/Binaries/*
 # Builds
 Build/*
 
-# Whitelist PakBlacklist-<BuildConfiguration>.txt files
-!Build/*/
-Build/*/**
-!Build/*/PakBlacklist*.txt
+# Whitelist Android
+!Build/Android
 
 # Don't ignore icon files in Build
 !Build/**/*.ico
