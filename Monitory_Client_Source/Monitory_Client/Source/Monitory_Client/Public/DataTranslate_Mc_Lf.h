@@ -17,6 +17,7 @@ struct MONITORY_CLIENT_API FDataMinMaxCurrent_Mc_Lf
 	UPROPERTY(EditAnywhere)
 	int32 Index = -1;
 
+protected:
 	UPROPERTY(EditAnywhere)
 	double Current = 0;
 
@@ -25,6 +26,49 @@ struct MONITORY_CLIENT_API FDataMinMaxCurrent_Mc_Lf
 
 	UPROPERTY(EditAnywhere)
 	double Max = 0;
+
+public:
+	void SetCurrent(const double Value)
+	{
+		Current = Value;
+		if (FMath::IsNaN(Current))
+		{
+			Current = 0.0;
+		}
+	}
+
+	void SetMin(const double Value)
+	{
+		Min = Value;
+		if (FMath::IsNaN(Min))
+		{
+			Min = 0.0;
+		}
+	}
+
+	void SetMax(const double Value)
+	{
+		Max = Value;
+		if (FMath::IsNaN(Max))
+		{
+			Max = 0.0;
+		}
+	}
+
+	double GetCurrent() const
+	{
+		return Current;
+	}
+
+	double GetMin() const
+	{
+		return Min;
+	}
+
+	double GetMax() const
+	{
+		return Max;
+	}
 
 	UPROPERTY(EditAnywhere)
 	FLinearColor Color = FLinearColor::White;

@@ -27,6 +27,19 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		}
 	}
 
+	if (EIsConnectedOverride != EIsConnectedOverride::NONE)
+	{
+		bIsConnected = EIsConnectedOverride == EIsConnectedOverride::CONNECTED;
+		if (!bIsConnected)
+		{
+			for (FTcpClient_Socket_Mc_Lf& Socket : TcpSockets)
+			{
+				CloseSocket(Socket.Socket);
+			}
+		}
+		return;
+	}
+
 	LastTcpSocketData = FString("");
 	//bIsConnected = false;
 	TcpSockets.SetNum(ADataTranslate_Mc_Lf::IPAddresses.Num());

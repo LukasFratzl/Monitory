@@ -73,8 +73,7 @@ void UWidgetMainMenu_Mc_Lf::CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCan
                                               UCanvasPanel* GpuUtilization, UCanvasPanel* GpuRamUtilization,
                                               UCanvasPanel* WattageCanvas, UCanvasPanel* TemperatureCanvas,
                                               UCanvasPanel* DriveUtilization, UCanvasPanel* NetUtilization,
-                                              UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel,
-                                              UCanvasPanel* GraphPanel)
+                                              UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel)
 {
 	CpuUtilizationCanvasPanel = CpuUtilization;
 
@@ -94,8 +93,6 @@ void UWidgetMainMenu_Mc_Lf::CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCan
 
 	IPSelectionPanel_Full = IPPanel;
 	HardwareMonitoringPanel_Full = MonitoringPanel;
-
-	GraphCollectionCanvasPanel = GraphPanel;
 }
 
 void UWidgetMainMenu_Mc_Lf::CacheBoxes(UVerticalBox* WattageParentContainer, UVerticalBox* TemperatureParentContainer,
@@ -239,6 +236,8 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 						if (IsValid(IPAddressWidget->IPAddressText))
 						{
 							IPAddressWidget->IPAddressText->SetText(FText::FromString(IPAddress));
+
+
 						}
 					}
 				}
@@ -263,6 +262,38 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 		DateNowTextBlock_Client->SetText(FText::FromString(FDateTime::Now().ToString(TEXT("%d/%m/%Y"))));
 	}
 
+	// CPU -> Start
+	ResetGraph(CpuUtilizationGraph);
+	// CPU -> End
+
+	// RAM -> Start
+	ResetGraph(CpuRamUtilizationGraph);
+	// RAM -> End
+
+	// Gpu -> Start
+	ResetGraph(GpuUtilizationGraph);
+
+	// GPU RAM -> Start
+	ResetGraph(GpuRamUtilizationGraph);
+	// GPU RAM -> End
+	// Gpu -> End
+
+	// Wattage -> Start
+	ResetGraph(WattageUtilizationGraph);
+	// Wattage -> End
+
+	// Temperature -> Start
+	ResetGraph(TemperatureUtilizationGraph);
+	// Temperature -> End
+
+	// Drive -> Start
+	ResetGraph(DriveUtilizationGraph);
+	// Drive -> End
+
+	// Net -> Start
+	ResetGraph(NetUtilizationGraph);
+	// Net -> End
+
 	return bInitThisFrame;
 }
 
@@ -281,9 +312,9 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceGraph(CpuUtilizationGraph, ADataTranslate_Mc_Lf::PcData.CpuLoadThreads, false, CpuFillColor,
 	             CpuUtilizationCanvasPanel);
 
-	AdvanceText(CpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuLoadTotal.Current, EPrecisionPoint::Zero,
+	AdvanceText(CpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuLoadTotal.GetCurrent(), EPrecisionPoint::Zero,
 	            TEXT("{0} %"));
-	AdvanceText(CpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuClockSpeedTotal.Current / 1000,
+	AdvanceText(CpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuClockSpeedTotal.GetCurrent() / 1000,
 	            EPrecisionPoint::Two, TEXT("{0} GHz"));
 	// CPU -> End
 
@@ -295,13 +326,13 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	             CpuRamFillColor,
 	             CpuRamUtilizationCanvasPanel);
 
-	AdvanceText(CpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamUsed.Current, EPrecisionPoint::Two,
+	AdvanceText(CpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamUsed.GetCurrent(), EPrecisionPoint::Two,
 	            TEXT("{0} GB"));
-	AdvanceText(CpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamPercentage.Current,
+	AdvanceText(CpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamPercentage.GetCurrent(),
 	            EPrecisionPoint::Zero, TEXT("{0} %"));
-	AdvanceText(CpuRamUtilizationGB_50PercentTextBlock, ADataTranslate_Mc_Lf::PcData.CpuMaxRam.Current * 0.5,
+	AdvanceText(CpuRamUtilizationGB_50PercentTextBlock, ADataTranslate_Mc_Lf::PcData.CpuMaxRam.GetCurrent() * 0.5,
 	            EPrecisionPoint::One, TEXT("{0}"));
-	AdvanceText(CpuRamUtilizationGB_100PercentTextBlock, ADataTranslate_Mc_Lf::PcData.CpuMaxRam.Current,
+	AdvanceText(CpuRamUtilizationGB_100PercentTextBlock, ADataTranslate_Mc_Lf::PcData.CpuMaxRam.GetCurrent(),
 	            EPrecisionPoint::One, TEXT("{0}"));
 	// RAM -> End
 
@@ -311,9 +342,9 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceGraph(GpuUtilizationGraph, TArray<FDataMinMaxCurrent_Mc_Lf>{ADataTranslate_Mc_Lf::PcData.GpuLoadTotal},
 	             false, GpuUtilFillColor, GpuUtilizationCanvasPanel);
 
-	AdvanceText(GpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuLoadTotal.Current, EPrecisionPoint::Zero,
+	AdvanceText(GpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuLoadTotal.GetCurrent(), EPrecisionPoint::Zero,
 	            TEXT("{0} %"));
-	AdvanceText(GpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuClockSpeedTotal.Current / 1000,
+	AdvanceText(GpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuClockSpeedTotal.GetCurrent() / 1000,
 	            EPrecisionPoint::Two, TEXT("{0} GHz"));
 
 	// GPU RAM -> Start
@@ -324,13 +355,13 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	             GpuRamFillColor,
 	             GpuRamUtilizationCanvasPanel);
 
-	AdvanceText(GpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamUsed.Current, EPrecisionPoint::Two,
+	AdvanceText(GpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamUsed.GetCurrent(), EPrecisionPoint::Two,
 	            TEXT("{0} GB"));
-	AdvanceText(GpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamPercentage.Current,
+	AdvanceText(GpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamPercentage.GetCurrent(),
 	            EPrecisionPoint::Zero, TEXT("{0} %"));
-	AdvanceText(GpuRamUtilizationGB_50PercentTextBlock, ADataTranslate_Mc_Lf::PcData.GpuMaxRam.Current * 0.5,
+	AdvanceText(GpuRamUtilizationGB_50PercentTextBlock, ADataTranslate_Mc_Lf::PcData.GpuMaxRam.GetCurrent() * 0.5,
 	            EPrecisionPoint::One, TEXT("{0}"));
-	AdvanceText(GpuRamUtilizationGB_100PercentTextBlock, ADataTranslate_Mc_Lf::PcData.GpuMaxRam.Current,
+	AdvanceText(GpuRamUtilizationGB_100PercentTextBlock, ADataTranslate_Mc_Lf::PcData.GpuMaxRam.GetCurrent(),
 	            EPrecisionPoint::One, TEXT("{0}"));
 	// GPU RAM -> End
 	// Gpu -> End
@@ -341,7 +372,7 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	                                           WattageCanvasPanel);
 
 	AdvanceText(WattageValueMaxTextBlock, MaxWattage.X, EPrecisionPoint::Zero, TEXT("{0} Max"));
-	AdvanceText(WattageValueTextBlock, ADataTranslate_Mc_Lf::PcData.WattageTotalCurrent.Current, EPrecisionPoint::Zero,
+	AdvanceText(WattageValueTextBlock, ADataTranslate_Mc_Lf::PcData.WattageTotalCurrent.GetCurrent(), EPrecisionPoint::Zero,
 	            TEXT("{0} W"));
 	AdvanceText(WattageValue_100PercentTextBlock, MaxWattage.Y * 1.25f, EPrecisionPoint::Zero, TEXT("{0}"));
 	AdvanceText(WattageValue_50PercentTextBlock, MaxWattage.Y * 0.5 * 1.25f, EPrecisionPoint::Zero, TEXT("{0}"));
@@ -357,7 +388,7 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	                                               TemperatureCanvasPanel);
 
 	AdvanceText(TemperatureValueMaxTextBlock, MaxTemperature.Y, EPrecisionPoint::One, TEXT("{0} Max"));
-	AdvanceText(TemperatureValueTextBlock, ADataTranslate_Mc_Lf::PcData.TemperatureMaxCurrent.Current,
+	AdvanceText(TemperatureValueTextBlock, ADataTranslate_Mc_Lf::PcData.TemperatureMaxCurrent.GetCurrent(),
 	            EPrecisionPoint::One, TEXT("{0} C"));
 	AdvanceText(TemperatureValue_100PercentTextBlock, MaxTemperature.Y * 1.25f, EPrecisionPoint::One, TEXT("{0}"));
 	AdvanceText(TemperatureValue_50PercentTextBlock, MaxTemperature.Y * 0.5 * 1.25f, EPrecisionPoint::One, TEXT("{0}"));
@@ -372,7 +403,7 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceGraph(DriveUtilizationGraph, ADataTranslate_Mc_Lf::PcData.DrivesLoad, false, DriveFillColor,
 	             DriveUtilizationCanvasPanel);
 
-	AdvanceText(DriveUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.DrivesMaxLoad.Current,
+	AdvanceText(DriveUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.DrivesMaxLoad.GetCurrent(),
 	            EPrecisionPoint::One, TEXT("{0} %"));
 	// Drive -> End
 
@@ -397,14 +428,14 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceText(NetMaxSpeed_100PercentTextBlock, MaxSpeed.Y * 1.25f, EPrecisionPoint::Two, TEXT("{0}"));
 	AdvanceText(NetMaxSpeed_50PercentTextBlock, MaxSpeed.Y * 0.5 * 1.25f, EPrecisionPoint::Two, TEXT("{0}"));
 
-	AdvanceText(NetMaxDownSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.DownloadMaxSpeed.Current, EPrecisionPoint::Two,
+	AdvanceText(NetMaxDownSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.DownloadMaxSpeed.GetCurrent(), EPrecisionPoint::Two,
 	            TEXT("{0} MB/s"));
 	if (IsValid(NetMaxDownSpeedTextBlock))
 	{
 		NetMaxDownSpeedTextBlock->SetColorAndOpacity(ADataTranslate_Mc_Lf::PcData.DownloadMaxSpeed.Color);
 	}
 
-	AdvanceText(NetMaxUpSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.UploadMaxSpeed.Current, EPrecisionPoint::Two,
+	AdvanceText(NetMaxUpSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.UploadMaxSpeed.GetCurrent(), EPrecisionPoint::Two,
 	            TEXT("{0} MB/s"));
 	if (IsValid(NetMaxUpSpeedTextBlock))
 	{
@@ -414,13 +445,51 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	// Net -> End
 }
 
+void UWidgetMainMenu_Mc_Lf::ResetGraph(FGraph_Mc_Lf& Graph)
+{
+	if (IsValid(Graph.FillArea.FillWidget))
+	{
+		Graph.FillArea.FillWidget->RemoveFromRoot();
+		Graph.FillArea.FillWidget->RemoveFromParent();
+		Graph.FillArea.FillWidget = nullptr;
+	}
+	if (IsValid(Graph.HighLine.Line))
+	{
+		Graph.HighLine.Line->RemoveFromRoot();
+		Graph.HighLine.Line->RemoveFromParent();
+		Graph.HighLine.Line = nullptr;
+	}
+	if (IsValid(Graph.LowLine.Line))
+	{
+		Graph.LowLine.Line->RemoveFromRoot();
+		Graph.LowLine.Line->RemoveFromParent();
+		Graph.LowLine.Line = nullptr;
+	}
+	for (FShapedLine_Mc_Lf& Line : Graph.Graph)
+	{
+		if (IsValid(Line.Line))
+		{
+			Line.Line->RemoveFromRoot();
+			Line.Line->RemoveFromParent();
+			Line.Line = nullptr;
+		}
+		if (IsValid(Line.Label))
+		{
+			Line.Label->RemoveFromRoot();
+			Line.Label->RemoveFromParent();
+			Line.Label = nullptr;
+		}
+	}
+	Graph.Graph.Empty();
+}
+
 void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints, const int32 NumLines,
                                       const TObjectPtr<UCanvasPanel> CanvasPanel) const
 {
 	const FGeometry& Geometry = CanvasPanel->GetCachedGeometry();
 	const FVector2f& CanvasPanelSize = FVector2f(USlateBlueprintLibrary::GetLocalSize(Geometry));
 
-	if (!IsValid(Graph.FillArea.FillWidget) && IsValid(GraphCollectionCanvasPanel))
+	if (!IsValid(Graph.FillArea.FillWidget))
 	{
 		Graph.FillArea.FillWidget = WidgetTree->ConstructWidget<UWidgetGraphFill_Mc_Lf>();
 		CanvasPanel->AddChildToCanvas(Graph.FillArea.FillWidget);
@@ -473,11 +542,13 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 
 	if (!Graph.Graph.Num())
 	{
-		for (const FShapedLine_Mc_Lf& Line : Graph.Graph)
+		for (FShapedLine_Mc_Lf& Line : Graph.Graph)
 		{
 			if (IsValid(Line.Line))
 			{
+				Line.Line->RemoveFromRoot();
 				Line.Line->RemoveFromParent();
+				Line.Line = nullptr;
 			}
 		}
 
@@ -510,6 +581,19 @@ void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints
 		}
 	}
 }
+
+// void UWidgetMainMenu_Mc_Lf::ResetLabels(FGraph_Mc_Lf& Graph)
+// {
+// 	const int32 NumGraphLines = Graph.Graph.Num();
+// 	for (int32 i = 0; i < NumGraphLines; ++i)
+// 	{
+// 		FShapedLine_Mc_Lf& Line = Graph.Graph[i];
+// 		if (IsValid(Line.Label))
+// 		{
+// 			Line.Label->RemoveFromParent();
+// 		}
+// 	}
+// }
 
 void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data,
                                        const TObjectPtr<UVerticalBox>& Parent) const
@@ -592,7 +676,7 @@ void UWidgetMainMenu_Mc_Lf::AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDat
 			if (IsValid(Line.Label->ValueText))
 			{
 				FString Text;
-				const double WantedValue = Value.Current;
+				const double WantedValue = Value.GetCurrent();
 				switch (Precision)
 				{
 				case EPrecisionPoint::One:
@@ -638,6 +722,11 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 
 		for (int32 i = 0; i < NumGraphLines; ++i)
 		{
+			if (!Data.IsValidIndex(i))
+			{
+				continue;
+			}
+
 			FShapedLine_Mc_Lf& Line = Graph.Graph[i];
 			if (!bIsLastIteration)
 			{
@@ -650,12 +739,12 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 			}
 			else
 			{
-				if (Data[i].Current > MaxValuePerUnit)
+				if (Data[i].GetCurrent() > MaxValuePerUnit)
 				{
-					MaxValuePerUnit = Data[i].Current;
+					MaxValuePerUnit = Data[i].GetCurrent();
 				}
 
-				MaxPointValue += Data[i].Current;
+				MaxPointValue += Data[i].GetCurrent();
 			}
 		}
 
@@ -668,6 +757,11 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 	for (int32 i = 0; i < NumGraphLines; ++i)
 	{
 		FShapedLine_Mc_Lf& Line = Graph.Graph[i];
+
+		if (!Data.IsValidIndex(i))
+		{
+			continue;
+		}
 
 		TArray<FVector2f> Points;
 		Points.AddUninitialized(FullNumPoints);
@@ -690,15 +784,15 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 		FVector2f LastPointLocation = Graph.CurrentCanvasSize;
 		if (bIsRelativeGraph)
 		{
-			const double Percentage = Data[i].Current / MaxValuePerUnit;
+			const double Percentage = Data[i].GetCurrent() / MaxValuePerUnit;
 			LastPointLocation.Y -= Graph.CurrentCanvasSize.Y * Percentage * 0.75f; // 0.75f for better view;
 		}
 		else
 		{
-			LastPointLocation.Y -= LastPointLocation.Y * Data[i].Current * 0.01f;
+			LastPointLocation.Y -= LastPointLocation.Y * Data[i].GetCurrent() * 0.01f;
 		}
 		Points.Last() = LastPointLocation;
-		Line.ValueHistory.Add(Data[i].Current);
+		Line.ValueHistory.Add(Data[i].GetCurrent());
 
 		if (Graph.bUseLineColorOverride)
 		{
@@ -756,7 +850,11 @@ void UWidgetMainMenu_Mc_Lf::AdvanceText(const TObjectPtr<UTextBlock> Text, const
 	if (IsValid(Text))
 	{
 		FString Message;
-		const double WantedValue = Value;
+		double WantedValue = Value;
+		if (FMath::IsNaN(WantedValue))
+		{
+			WantedValue = 0.0;
+		}
 		switch (Precision)
 		{
 		case EPrecisionPoint::One:
