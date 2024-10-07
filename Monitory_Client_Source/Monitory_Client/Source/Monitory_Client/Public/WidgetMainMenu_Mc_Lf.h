@@ -355,15 +355,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> GraphFillAreaMaterial;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UCanvasPanel> GraphCollectionCanvasPanel;
-
 	UFUNCTION(BlueprintCallable)
 	void OnAddIPButtonPressed();
 	
 
 	UFUNCTION(BlueprintCallable)
-	void CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCanvasPanel* RamUtilization, UCanvasPanel* GpuUtilization, UCanvasPanel* GpuRamUtilization, UCanvasPanel* WattageCanvas, UCanvasPanel* TemperatureCanvas, UCanvasPanel* DriveUtilization, UCanvasPanel* NetUtilization, UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel, UCanvasPanel* GraphPanel);
+	void CacheCanvasPanels(UCanvasPanel* CpuUtilization, UCanvasPanel* RamUtilization, UCanvasPanel* GpuUtilization, UCanvasPanel* GpuRamUtilization, UCanvasPanel* WattageCanvas, UCanvasPanel* TemperatureCanvas, UCanvasPanel* DriveUtilization, UCanvasPanel* NetUtilization, UCanvasPanel* IPPanel, UCanvasPanel* MonitoringPanel);
 
 	UFUNCTION(BlueprintCallable)
 	void CacheBoxes(UVerticalBox* WattageParentContainer, UVerticalBox* TemperatureParentContainer, UVerticalBox* IPAddresses);
@@ -387,13 +384,15 @@ public:
 	bool TickIPSelectionPanel(float DeltaTime);
 	void TickMonitoringPanel(float DeltaTime);
 
-
+	void ResetGraph(FGraph_Mc_Lf& Graph);
 	void InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints, const int32 NumLines, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
 
+	// void ResetLabels(FGraph_Mc_Lf& Graph);
 	void InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const TObjectPtr<UVerticalBox>& Parent) const;
 	void AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const EPrecisionPoint& Precision, const TObjectPtr<UVerticalBox>& Parent) const;
 
 	FVector2D AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, bool bIsRelativeGraph, const FLinearColor& FillAreaColor, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
+
 	static void AdvanceText(const TObjectPtr<UTextBlock> Text, const double Value, const EPrecisionPoint& Precision, const FString& FormatMessage);
 
 	UFUNCTION(BlueprintCallable)

@@ -20,6 +20,14 @@ struct FTcpClient_Socket_Mc_Lf
 	float LastTimeReceivedMessage = 5;
 };
 
+UENUM(BlueprintType)
+enum class EIsConnectedOverride : uint8
+{
+	NONE,
+	CONNECTED,
+	DISCONNECTED
+};
+
 
 UCLASS()
 class MONITORY_CLIENT_API ATcpClient_Mc_Lf : public AActor
@@ -47,6 +55,8 @@ public:
 
 	inline static bool bNeedUIRebuild = false;
 	inline static bool bIsConnected = false;
+
+	inline static EIsConnectedOverride EIsConnectedOverride = EIsConnectedOverride::NONE;
 
 	// FString ConnectionStateToString(ESocketConnectionState ConnectionState)
 	// {

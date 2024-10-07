@@ -31,7 +31,8 @@ void UWidgetIPAddress_Mc_Lf::OnDeleteButtonPressed()
 		}
 		ADataTranslate_Mc_Lf::SaveDataToInternalStorage(Data, ADataTranslate_Mc_Lf::IPAddressesFileName);
 	}
-	
+
+	this->RemoveFromRoot();
 	this->RemoveFromParent();
 }
 

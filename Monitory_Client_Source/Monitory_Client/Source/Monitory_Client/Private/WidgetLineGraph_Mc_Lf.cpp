@@ -12,11 +12,14 @@ void SGraphLineWidget_Mc_Lf::Construct(const FArguments& InArgs)
 {
 	Brush = FInvalidatableBrushAttribute(InArgs._Brush);
 }
+
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
-int32 SGraphLineWidget_Mc_Lf::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect,
-	FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle,
-	bool bParentEnabled) const
+int32 SGraphLineWidget_Mc_Lf::OnPaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry,
+                                      const FSlateRect& MyCullingRect,
+                                      FSlateWindowElementList& OutDrawElements, int32 LayerId,
+                                      const FWidgetStyle& InWidgetStyle,
+                                      bool bParentEnabled) const
 {
 	const FPaintGeometry& PaintGeometry = AllottedGeometry.ToPaintGeometry();
 	PaintGeometry.CommitTransformsIfUsingLegacyConstructor();
@@ -60,17 +63,17 @@ int32 SGraphLineWidget_Mc_Lf::OnPaint(const FPaintArgs& Args, const FGeometry& A
 	}
 
 
-	const FSlateResourceHandle Handle = FSlateApplication::Get().GetRenderer()->GetResourceHandle( *SlateBrush );
+	const FSlateResourceHandle Handle = FSlateApplication::Get().GetRenderer()->GetResourceHandle(*SlateBrush);
 	FSlateDrawElement::MakeCustomVerts(
-        OutDrawElements,
-        LayerId,
-        Handle,
-        Vertices,
-        Indices,
-        nullptr,
-        0,
-        0
-    );
+		OutDrawElements,
+		LayerId,
+		Handle,
+		Vertices,
+		Indices,
+		nullptr,
+		0,
+		0
+	);
 	return LayerId;
 }
 
@@ -84,7 +87,10 @@ void SGraphLineWidget_Mc_Lf::SetBrush(FSlateBrush* InBrush)
 void UWidgetGraphLine_Mc_Lf::SynchronizeProperties()
 {
 	Super::SynchronizeProperties();
-	GraphPointSlateWidget->SetBrush(&Brush);
+	if (GraphPointSlateWidget.IsValid())
+	{
+		GraphPointSlateWidget->SetBrush(&Brush);
+	}
 }
 
 void UWidgetGraphLine_Mc_Lf::ReleaseSlateResources(bool bReleaseChildren)
@@ -105,4 +111,3 @@ TSharedRef<SWidget> UWidgetGraphLine_Mc_Lf::RebuildWidget()
 		.Brush(&Brush);
 	return GraphPointSlateWidget.ToSharedRef();
 }
-

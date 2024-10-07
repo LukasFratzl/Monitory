@@ -35,14 +35,14 @@ void ADataTranslate_Mc_Lf::BeginPlay()
 			if (!Entry.IsEmpty())
 			{
 				IPAddresses.Add(Entry);
-				UE_LOG(LogTemp, Warning, TEXT("Added %s"), *Entry);	
+				UE_LOG(LogTemp, Warning, TEXT("Added %s"), *Entry);
 			}
 		}
 		bChangedIPAddresses = true;
 	}
 
 	bCachedIPAddresses = true;
-	
+
 
 	// const FString& Data =
 	// 	"Cpu_Utility:0:15,557993:6,7117453:89,82752|Cpu_Utility:1:15,525704:0:26,91856|Cpu_Utility:2:11,417341:11,417341:47,226685|Cpu_Utility:3:10,104376:0:37,00373|Cpu_Utility:4:13,801252:5,4927645:47,00341|Cpu_Utility:5:10,723084:0:32,723003|Cpu_Utility:6:15,994996:6,4926567:56,127678|Cpu_Utility:7:16,774988:0:37,78848|Cpu_Utility:8:16,250414:6,6773357:36,040123|Cpu_Utility:9:9,873629:0:40,31513|Cpu_Utility:10:12,557209:4,7959685:53,40341|Cpu_Utility:11:9,688729:0:34,275948|Cpu_Utility:Total:13,189143:6,1984777:34,5123|";
@@ -55,7 +55,16 @@ void ADataTranslate_Mc_Lf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	const FString& Data = ATcpClient_Mc_Lf::LastTcpSocketData;//ReadOneLineFromFile(0);
+	FString Data = "";
+
+	if (ATcpClient_Mc_Lf::bIsConnected)
+	{
+		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
+	}
+	else
+	{
+		ATcpClient_Mc_Lf::LastTcpSocketData = "";
+	}
 
 	CreatePCData(PcData, Data);
 
@@ -114,9 +123,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 				{
 					FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 					Range.Index = Index;
-					Range.Current = Current;
-					Range.Min = Min;
-					Range.Max = Max;
+					Range.SetCurrent(Current);
+					Range.SetMin(Min);
+					Range.SetMax(Max);
 
 					CpuThreadsRaw.Add(Range);
 					//FromData.bEditedSometimeInThePast = true;
@@ -125,9 +134,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 				{
 					FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 					Range.Index = Index;
-					Range.Current = (Current + FromData.CpuLoadTotal.Current) / 2;
-					Range.Min = Min;
-					Range.Max = Max;
+					Range.SetCurrent(Current);
+					Range.SetMin(Min);
+					Range.SetMax(Max);
 					Range.Color = GenerateDistinctColors(0);
 
 					FromData.CpuLoadTotal = Range;
@@ -148,9 +157,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = Index;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 
 				if (Index == INDEX_NONE) // For now we are only interested into the average
 				{
@@ -162,9 +171,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 
 				if (Unit == "Available")
 				{
@@ -180,9 +189,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				Range.Color = GenerateDistinctColors(3);
 
 				FromData.GpuClockSpeedTotal = Range;
@@ -192,9 +201,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				Range.Color = GenerateDistinctColors(4);
 
 				FromData.GpuLoadTotal = Range;
@@ -204,9 +213,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 
 				if (Unit == "Available")
 				{
@@ -222,9 +231,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				//Range.Color = GenerateDistinctColors(4);
 				Range.Name = Unit;
 
@@ -237,16 +246,16 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 				Range.Index = INDEX_NONE;
 				if (Current < 273.15) // Probably Celsius
 				{
-					Range.Current = Current;
-					Range.Min = Min;
-					Range.Max = Max;
+					Range.SetCurrent(Current);
+					Range.SetMin(Min);
+					Range.SetMax(Max);
 				}
 				else
 				{
 					// Convert Kelvin to Celsius
-					Range.Current = Current - 273.15;
-					Range.Min = Min - 273.15;
-					Range.Max = Max - 273.15;
+					Range.SetCurrent(Current - 273.15);
+					Range.SetMin(Min - 273.15);
+					Range.SetMax(Max - 273.15);
 				}
 				//Range.Color = GenerateDistinctColors(4);
 				Range.Name = Unit;
@@ -258,9 +267,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				//Range.Color = GenerateDistinctColors(4);
 				Range.Name = Unit;
 
@@ -271,9 +280,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				//Range.Color = GenerateDistinctColors(4);
 
 				Range.Name = Unit;
@@ -292,9 +301,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current;
-				Range.Min = Min;
-				Range.Max = Max;
+				Range.SetCurrent(Current);
+				Range.SetMin(Min);
+				Range.SetMax(Max);
 				//Range.Color = GenerateDistinctColors(4);
 				Range.Name = Unit;
 
@@ -305,9 +314,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current / 1024 / 1024; // It's in bytes
-				Range.Min = Min / 1024 / 1024; // It's in bytes
-				Range.Max = Max / 1024 / 1024; // It's in bytes
+				Range.SetCurrent(Current / 1024 / 1024); // It's in bytes
+				Range.SetMin(Min / 1024 / 1024); // It's in bytes
+				Range.SetMax(Max / 1024 / 1024); // It's in bytes
 				Range.Name = Unit;
 
 				DownloadSpeedRaw.Add(Range);
@@ -317,9 +326,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			{
 				FDataMinMaxCurrent_Mc_Lf Range = FDataMinMaxCurrent_Mc_Lf();
 				Range.Index = INDEX_NONE;
-				Range.Current = Current / 1024 / 1024; // It's in bytes
-				Range.Min = Min / 1024 / 1024; // It's in bytes
-				Range.Max = Max / 1024 / 1024; // It's in bytes
+				Range.SetCurrent(Current / 1024 / 1024); // It's in bytes
+				Range.SetMin(Min / 1024 / 1024); // It's in bytes
+				Range.SetMax(Max / 1024 / 1024); // It's in bytes
 				Range.Name = Unit;
 
 				UploadSpeedRaw.Add(Range);
@@ -336,10 +345,10 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 			const FDataMinMaxCurrent_Mc_Lf& Thread_Raw = CpuThreadsRaw[ThreadIdx];
 
 			//Thread.Current = (Thread_Raw.Current + Thread.Current) / 2;
-			Thread.Current = Thread_Raw.Current;
+			Thread.SetCurrent(Thread_Raw.GetCurrent());
 			Thread.Index = Thread_Raw.Index;
-			Thread.Min = Thread_Raw.Min;
-			Thread.Max = Thread_Raw.Max;
+			Thread.SetMin(Thread_Raw.GetMin());
+			Thread.SetMax(Thread_Raw.GetMax());
 			Thread.Color = GenerateDistinctColors(Thread.Index + 1);
 		}
 	}
@@ -348,9 +357,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 	{
 		FromData.Wattage.SetNum(NumWattage);
 
-		FromData.WattageTotalCurrent.Current = 0;
-		FromData.WattageTotalCurrent.Max = 0;
-		FromData.WattageTotalCurrent.Min = 0;
+		FromData.WattageTotalCurrent.SetCurrent(0);
+		FromData.WattageTotalCurrent.SetMax(0);
+		FromData.WattageTotalCurrent.SetMin(0);
 		for (int32 WattageIdx = 0; WattageIdx < NumWattage; ++WattageIdx)
 		{
 			FDataMinMaxCurrent_Mc_Lf& Wattage = FromData.Wattage[WattageIdx];
@@ -360,9 +369,10 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 
 			Wattage.Color = GenerateDistinctColors(WattageIdx + 7);
 
-			FromData.WattageTotalCurrent.Current += Wattage_Raw.Current;
-			FromData.WattageTotalCurrent.Max += Wattage_Raw.Max;
-			FromData.WattageTotalCurrent.Min += Wattage_Raw.Min;
+			FromData.WattageTotalCurrent.SetCurrent(
+				FromData.WattageTotalCurrent.GetCurrent() + Wattage_Raw.GetCurrent());
+			FromData.WattageTotalCurrent.SetMax(FromData.WattageTotalCurrent.GetMax() + Wattage_Raw.GetMax());
+			FromData.WattageTotalCurrent.SetMin(FromData.WattageTotalCurrent.GetMin() + Wattage_Raw.GetMin());
 		}
 	}
 
@@ -370,9 +380,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 	{
 		FromData.Temperature.SetNum(NumTemps);
 
-		FromData.TemperatureMaxCurrent.Current = 0;
-		FromData.TemperatureMaxCurrent.Max = 0;
-		FromData.TemperatureMaxCurrent.Min = 1000;
+		FromData.TemperatureMaxCurrent.SetCurrent(0);
+		FromData.TemperatureMaxCurrent.SetMax(0);
+		FromData.TemperatureMaxCurrent.SetMin(1000);
 		for (int32 TempIdx = 0; TempIdx < NumTemps; ++TempIdx)
 		{
 			FDataMinMaxCurrent_Mc_Lf& Temp = FromData.Temperature[TempIdx];
@@ -382,17 +392,17 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 
 			Temp.Color = GenerateDistinctColors(TempIdx + 7);
 
-			if (Temp_Raw.Current > FromData.TemperatureMaxCurrent.Current)
+			if (Temp_Raw.GetCurrent() > FromData.TemperatureMaxCurrent.GetCurrent())
 			{
-				FromData.TemperatureMaxCurrent.Current = Temp_Raw.Current;
+				FromData.TemperatureMaxCurrent.SetCurrent(Temp_Raw.GetCurrent());
 			}
-			if (Temp_Raw.Max > FromData.TemperatureMaxCurrent.Max)
+			if (Temp_Raw.GetMax() > FromData.TemperatureMaxCurrent.GetMax())
 			{
-				FromData.TemperatureMaxCurrent.Max = Temp_Raw.Max;
+				FromData.TemperatureMaxCurrent.SetMax(Temp_Raw.GetMax());
 			}
-			if (Temp_Raw.Min < FromData.TemperatureMaxCurrent.Min)
+			if (Temp_Raw.GetMin() < FromData.TemperatureMaxCurrent.GetMin())
 			{
-				FromData.TemperatureMaxCurrent.Min = Temp_Raw.Min;
+				FromData.TemperatureMaxCurrent.SetMin(Temp_Raw.GetMin());
 			}
 		}
 	}
@@ -400,43 +410,43 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 	if (const int32 NumDrives = DriveLoadRaw.Num())
 	{
 		FromData.DrivesLoad.SetNum(NumDrives);
-		FromData.DrivesMaxLoad.Current = 0;
-		FromData.DrivesMaxLoad.Min = 100;
-		FromData.DrivesMaxLoad.Max = 0;
+		FromData.DrivesMaxLoad.SetCurrent(0);
+		FromData.DrivesMaxLoad.SetMin(100);
+		FromData.DrivesMaxLoad.SetMax(0);
 		for (int32 DriveIdx = 0; DriveIdx < NumDrives; ++DriveIdx)
 		{
 			FDataMinMaxCurrent_Mc_Lf& Drive = FromData.DrivesLoad[DriveIdx];
 			const FDataMinMaxCurrent_Mc_Lf& Drive_Raw = DriveLoadRaw[DriveIdx];
 
-			Drive.Current = Drive_Raw.Current;
+			Drive.SetCurrent(Drive_Raw.GetCurrent());
 			Drive.Index = DriveIdx;
-			Drive.Min = Drive_Raw.Min;
-			Drive.Max = Drive_Raw.Max;
+			Drive.SetMin(Drive_Raw.GetMin());
+			Drive.SetMax(Drive_Raw.GetMax());
 			Drive.Color = GenerateDistinctColors(DriveIdx + 7);
 
-			if (Drive.Current > FromData.DrivesMaxLoad.Current)
+			if (Drive.GetCurrent() > FromData.DrivesMaxLoad.GetCurrent())
 			{
-				FromData.DrivesMaxLoad.Current = Drive.Current;
+				FromData.DrivesMaxLoad.SetCurrent(Drive.GetCurrent());
 			}
 
-			if (Drive.Max > FromData.DrivesMaxLoad.Max)
+			if (Drive.GetMax() > FromData.DrivesMaxLoad.GetMax())
 			{
-				FromData.DrivesMaxLoad.Max = Drive.Max;
+				FromData.DrivesMaxLoad.SetMax(Drive.GetMax());
 			}
 
-			if (Drive.Min < FromData.DrivesMaxLoad.Min)
+			if (Drive.GetMin() < FromData.DrivesMaxLoad.GetMin())
 			{
-				FromData.DrivesMaxLoad.Min = Drive.Min;
+				FromData.DrivesMaxLoad.SetMin(Drive.GetMin());
 			}
 		}
 	}
-	
+
 	if (const int32 NumDownloadSpeeds = DownloadSpeedRaw.Num())
 	{
 		FromData.DownloadSpeeds.SetNum(NumDownloadSpeeds);
-		FromData.DownloadMaxSpeed.Current = 0;
-		FromData.DownloadMaxSpeed.Min = 10000000;
-		FromData.DownloadMaxSpeed.Max = 0;
+		FromData.DownloadMaxSpeed.SetCurrent(0);
+		FromData.DownloadMaxSpeed.SetMin(10000000);
+		FromData.DownloadMaxSpeed.SetMax(0);
 		for (int32 DlIdx = 0; DlIdx < NumDownloadSpeeds; ++DlIdx)
 		{
 			FDataMinMaxCurrent_Mc_Lf& Speed = FromData.DownloadSpeeds[DlIdx];
@@ -444,22 +454,22 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 
 			Speed = Speed_Raw;
 			Speed.Index = DlIdx;
-			
+
 			Speed.Color = GenerateDistinctColors(Speed.Index + 1);
 
-			if (Speed.Current > FromData.DownloadMaxSpeed.Current)
+			if (Speed.GetCurrent() > FromData.DownloadMaxSpeed.GetCurrent())
 			{
-				FromData.DownloadMaxSpeed.Current = Speed.Current;
+				FromData.DownloadMaxSpeed.SetCurrent(Speed.GetCurrent());
 			}
 
-			if (Speed.Max > FromData.DownloadMaxSpeed.Max)
+			if (Speed.GetMax() > FromData.DownloadMaxSpeed.GetMax())
 			{
-				FromData.DownloadMaxSpeed.Max = Speed.Max;
+				FromData.DownloadMaxSpeed.SetMax(Speed.GetMax());
 			}
 
-			if (Speed.Min < FromData.DownloadMaxSpeed.Min)
+			if (Speed.GetMin() < FromData.DownloadMaxSpeed.GetMin())
 			{
-				FromData.DownloadMaxSpeed.Min = Speed.Min;
+				FromData.DownloadMaxSpeed.SetMin(Speed.GetMin());
 			}
 		}
 		FromData.DownloadMaxSpeed.Color = GenerateDistinctColors(5);
@@ -468,9 +478,9 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 	if (const int32 NumUploadSpeeds = UploadSpeedRaw.Num())
 	{
 		FromData.UploadSpeeds.SetNum(NumUploadSpeeds);
-		FromData.UploadMaxSpeed.Current = 0;
-		FromData.UploadMaxSpeed.Min = 10000000;
-		FromData.UploadMaxSpeed.Max = 0;
+		FromData.UploadMaxSpeed.SetCurrent(0);
+		FromData.UploadMaxSpeed.SetMin(10000000);
+		FromData.UploadMaxSpeed.SetMax(0);
 		for (int32 UlIdx = 0; UlIdx < NumUploadSpeeds; ++UlIdx)
 		{
 			FDataMinMaxCurrent_Mc_Lf& Speed = FromData.UploadSpeeds[UlIdx];
@@ -478,54 +488,57 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 
 			Speed = Speed_Raw;
 			Speed.Index = UlIdx;
-			
+
 			Speed.Color = GenerateDistinctColors(Speed.Index + 1);
 
-			if (Speed.Current > FromData.UploadMaxSpeed.Current)
+			if (Speed.GetCurrent() > FromData.UploadMaxSpeed.GetCurrent())
 			{
-				FromData.UploadMaxSpeed.Current = Speed.Current;
+				FromData.UploadMaxSpeed.SetCurrent(Speed.GetCurrent());
 			}
 
-			if (Speed.Max > FromData.UploadMaxSpeed.Max)
+			if (Speed.GetMax() > FromData.UploadMaxSpeed.GetMax())
 			{
-				FromData.UploadMaxSpeed.Max = Speed.Max;
+				FromData.UploadMaxSpeed.SetMax(Speed.GetMax());
 			}
 
-			if (Speed.Min < FromData.UploadMaxSpeed.Min)
+			if (Speed.GetMin() < FromData.UploadMaxSpeed.GetMin())
 			{
-				FromData.UploadMaxSpeed.Min = Speed.Min;
+				FromData.UploadMaxSpeed.SetMin(Speed.GetMin());
 			}
 		}
 		FromData.UploadMaxSpeed.Color = GenerateDistinctColors(6);
 	}
 
-	FromData.CpuMaxRam.Current = FromData.CpuRamUsed.Current + FromData.CpuRamAvailable.Current;
+	FromData.CpuMaxRam.SetCurrent(FromData.CpuRamUsed.GetCurrent() + FromData.CpuRamAvailable.GetCurrent());
 	FromData.CpuMaxRam.Index = INDEX_NONE;
 	FromData.CpuMaxRam.Color = GenerateDistinctColors(1);
-	FromData.CpuMaxRam.Max = FromData.CpuMaxRam.Current;
-	FromData.CpuMaxRam.Min = 0;
+	FromData.CpuMaxRam.SetMax(FromData.CpuMaxRam.GetCurrent());
+	FromData.CpuMaxRam.SetMin(0);
 
-	FromData.CpuRamPercentage.Current = FromData.CpuRamUsed.Current / FromData.CpuMaxRam.Current * 100;
+	FromData.CpuRamPercentage.SetCurrent(FromData.CpuRamUsed.GetCurrent() / FromData.CpuMaxRam.GetCurrent() * 100);
 	FromData.CpuRamPercentage.Index = INDEX_NONE;
 	FromData.CpuRamPercentage.Color = GenerateDistinctColors(1);
-	FromData.CpuRamPercentage.Max = FromData.CpuRamUsed.Max / FromData.CpuMaxRam.Current * 100;
-	FromData.CpuRamPercentage.Min = FromData.CpuRamUsed.Min / FromData.CpuMaxRam.Current * 100;
+	FromData.CpuRamPercentage.SetMax(FromData.CpuRamUsed.GetMax() / FromData.CpuMaxRam.GetCurrent() * 100);
+	FromData.CpuRamPercentage.SetMin(FromData.CpuRamUsed.GetMin() / FromData.CpuMaxRam.GetCurrent() * 100);
 
-	FromData.GpuMaxRam.Current = FromData.GpuRamUsed.Current + FromData.GpuRamAvailable.Current;
+	FromData.GpuMaxRam.SetCurrent(FromData.GpuRamUsed.GetCurrent() + FromData.GpuRamAvailable.GetCurrent());
 	FromData.GpuMaxRam.Index = INDEX_NONE;
 	FromData.GpuMaxRam.Color = GenerateDistinctColors(2);
-	FromData.GpuMaxRam.Max = FromData.GpuMaxRam.Current;
-	FromData.GpuMaxRam.Min = 0;
+	FromData.GpuMaxRam.SetMax(FromData.GpuMaxRam.GetCurrent());
+	FromData.GpuMaxRam.SetMin(0);
 
-	FromData.GpuRamPercentage.Current = FromData.GpuRamUsed.Current / FromData.GpuMaxRam.Current * 100;
+	FromData.GpuRamPercentage.SetCurrent(FromData.GpuRamUsed.GetCurrent() / FromData.GpuMaxRam.GetCurrent() * 100);
 	FromData.GpuRamPercentage.Index = INDEX_NONE;
 	FromData.GpuRamPercentage.Color = GenerateDistinctColors(5);
-	FromData.GpuRamPercentage.Max = FromData.GpuRamUsed.Max / FromData.GpuMaxRam.Current * 100;
-	FromData.GpuRamPercentage.Min = FromData.GpuRamUsed.Min / FromData.GpuMaxRam.Current * 100;
+	FromData.GpuRamPercentage.SetMax(FromData.GpuRamUsed.GetMax() / FromData.GpuMaxRam.GetCurrent() * 100);
+	FromData.GpuRamPercentage.SetMin(FromData.GpuRamUsed.GetMin() / FromData.GpuMaxRam.GetCurrent() * 100);
 
-	FromData.DownloadUploadMaxSpeed.Current = FMath::Max(FromData.DownloadMaxSpeed.Current, FromData.UploadMaxSpeed.Current);
-	FromData.DownloadUploadMaxSpeed.Max = FMath::Max(FromData.DownloadMaxSpeed.Max, FromData.UploadMaxSpeed.Max);
-	FromData.DownloadUploadMaxSpeed.Min = FMath::Min(FromData.DownloadMaxSpeed.Min, FromData.UploadMaxSpeed.Min);
+	FromData.DownloadUploadMaxSpeed.SetCurrent(FMath::Max(FromData.DownloadMaxSpeed.GetCurrent(),
+	                                                      FromData.UploadMaxSpeed.GetCurrent()));
+	FromData.DownloadUploadMaxSpeed.SetMax(FMath::Max(FromData.DownloadMaxSpeed.GetMax(),
+	                                                  FromData.UploadMaxSpeed.GetMax()));
+	FromData.DownloadUploadMaxSpeed.SetMin(FMath::Min(FromData.DownloadMaxSpeed.GetMin(),
+	                                                  FromData.UploadMaxSpeed.GetMin()));
 	FromData.DownloadUploadMaxSpeed.Index = INDEX_NONE;
 
 	FromData.DownloadUploadSpeedsGraph.SetNum(2);
@@ -673,7 +686,8 @@ bool ADataTranslate_Mc_Lf::SaveDataToInternalStorage(const FString& DataToSave, 
 	// Create a new platform file manager
 
 	// Write the data to the file
-	if (IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile(); PlatformFile.CreateDirectoryTree(*SaveDirectory))
+	if (IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile(); PlatformFile.
+		CreateDirectoryTree(*SaveDirectory))
 	{
 		UE_LOG(LogTemp, Display, TEXT("Saving Data to: %s"), *SavePath);
 		FFileHelper::SaveStringToFile(DataToSave, *SavePath);
@@ -686,14 +700,15 @@ bool ADataTranslate_Mc_Lf::SaveDataToInternalStorage(const FString& DataToSave, 
 FString ADataTranslate_Mc_Lf::ReadDataFromInternalStorage(const FString& FileNameToRead)
 {
 	FString DataRead;
-    
+
 	// Get the path to the internal storage directory
 	const FString& SaveDirectory = FPaths::ProjectPersistentDownloadDir();
-    
+
 	// Combine with the desired file name
 
 	// Read the contents of the file
-	if (const FString& ReadFilePath = FPaths::Combine(SaveDirectory, FileNameToRead); FFileHelper::LoadFileToString(DataRead, *ReadFilePath))
+	if (const FString& ReadFilePath = FPaths::Combine(SaveDirectory, FileNameToRead); FFileHelper::LoadFileToString(
+		DataRead, *ReadFilePath))
 	{
 		// DataRead now contains the contents of the file
 		return DataRead;
