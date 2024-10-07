@@ -92,7 +92,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 				else
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Found Server...."))
-				}	
+				}
 			}
 		}
 
@@ -123,7 +123,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		{
 			LastTcpSocketData = ReceiveData_Mc(Socket.Socket);
 		}
-		
+
 		if (!LastTcpSocketData.IsEmpty())
 		{
 			//LastTcpSocketData = Data;
@@ -134,6 +134,16 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 				bNeedUIRebuild = true;
 			}
 			bIsConnected = true;
+
+			for (FTcpClient_Socket_Mc_Lf& Other : TcpSockets)
+			{
+				// Close all other sockets because the client can only handle 1 server at a time
+				if (Other.Socket != Socket.Socket)
+				{
+					CloseSocket(Other.Socket);
+				}
+			}
+
 			return;
 		}
 

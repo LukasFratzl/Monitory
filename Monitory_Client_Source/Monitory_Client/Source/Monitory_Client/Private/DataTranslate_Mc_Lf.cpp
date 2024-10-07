@@ -61,6 +61,10 @@ void ADataTranslate_Mc_Lf::Tick(float DeltaTime)
 	{
 		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
 	}
+	else
+	{
+		ATcpClient_Mc_Lf::LastTcpSocketData = "";
+	}
 
 	CreatePCData(PcData, Data);
 
