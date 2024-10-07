@@ -20,6 +20,8 @@ namespace Monitory_Server_Linux
         private static bool _turbostatCommandRunning;
         private static float _currentCpuWatt = 0.0f;
         private static float _currentCpuTemp = 0.0f;
+        private static string _currentCPUName = "Compute Unit";
+        private static string _currentGPUName = "Graphics";
 
         private readonly TcpListener _server = new TcpListener(IPAddress.Any, 54000);
         private static Dictionary<Commands, string> _commands = new Dictionary<Commands, string>();
@@ -45,9 +47,9 @@ namespace Monitory_Server_Linux
             _commands.Clear();
             _commands.Add(Commands.CPU_MHZ_STR, "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
             _commands.Add(Commands.RAM_STR, "-c \"free -m | awk '/^Mem/ {print $2/1000 \\\"\\n\\\" $3/1000}'\"");
-            _commands.Add(Commands.CPU_NAME,
-                "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
-            _commands.Add(Commands.GPU_NAME, "-c \"nvidia-smi --query-gpu=name --format=csv,noheader\"");
+           // _commands.Add(Commands.CPU_NAME,
+            //    "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
+            //_commands.Add(Commands.GPU_NAME, "-c \"nvidia-smi --query-gpu=name --format=csv,noheader\"");
             _commands.Add(Commands.GPU_UTIL,
                 "-c \"nvidia-smi --query-gpu=utilization.gpu --format=csv,noheader,nounits\"");
             _commands.Add(Commands.GPU_CLOCK,
@@ -173,6 +175,22 @@ namespace Monitory_Server_Linux
                     }
 
                     ConcurrentDictionary<Commands, string> _commandsOutput = GetSystemData(_commands);
+
+                    // string gpuName = "";
+                    // _commandsOutput.TryGetValue(Commands.GPU_NAME, out gpuName);
+                    //
+                    // string cpuName = "";
+                    // _commandsOutput.TryGetValue(Commands.CPU_NAME, out cpuName);
+                    //
+                    // if (string.IsNullOrEmpty(cpuName) || string.IsNullOrEmpty(gpuName) ||
+                    //     cpuName.ToLower().Contains("oem") || cpuName.ToLower().Contains("unknown"))
+                    // {
+                    //     continue;
+                    // }
+
+                    // _currentCPUName = cpuName;
+                    // _currentGPUName = gpuName;
+
                     _dataToSend = CollectData(_commandsOutput);
 
                     // string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
@@ -396,6 +414,11 @@ namespace Monitory_Server_Linux
             string mhzString = "";
             _commandsOutput.TryGetValue(Commands.CPU_MHZ_STR, out mhzString);
 
+            if (mhzString == null)
+            {
+                mhzString = "";
+            }
+
             string[] splittedMhzString = mhzString.Split(new[] { Environment.NewLine },
                 StringSplitOptions.RemoveEmptyEntries);
 
@@ -430,6 +453,11 @@ namespace Monitory_Server_Linux
             string ramString = "";
             _commandsOutput.TryGetValue(Commands.RAM_STR, out ramString);
             // Console.WriteLine(ramString);
+
+            if (ramString == null)
+            {
+                ramString = "";
+            }
 
             string[] splittedRamString = ramString.Split(new[] { Environment.NewLine },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -560,10 +588,8 @@ namespace Monitory_Server_Linux
 
         public static void CollectCpuData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
         {
-            // string name = RunCommand("bash",
-            //     "-c \"lscpu | grep 'Model name' | awk -F ':' '{print $2}' | awk '{$1=$1};1'\"");
-            string name = "";
-            _commandsOutput.TryGetValue(Commands.CPU_NAME, out name);
+            string name = _currentCPUName;
+           //_commandsOutput.TryGetValue(Commands.CPU_NAME, out name);
             string file = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info.txt");
             // string wattageString = RunCommand("bash", $"-c \"cat \"{file}\"");
             // string tempString = RunSudoCommand("bash", "-c \"sudo turbostat --quiet --show PkgTmp 1 1\"");
@@ -687,8 +713,8 @@ namespace Monitory_Server_Linux
             //     "-c \"nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits\"");
             // string temp = RunCommand("bash", "-c \"nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader\"");
             // string watt = RunCommand("bash", "-c \"nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits\"");
-            string name = "";
-            _commandsOutput.TryGetValue(Commands.GPU_NAME, out name);
+            string name = _currentGPUName;
+           // _commandsOutput.TryGetValue(Commands.GPU_NAME, out name);
             string utility = "";
             _commandsOutput.TryGetValue(Commands.GPU_UTIL, out utility);
             string clock = "";
