@@ -299,6 +299,26 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 
 void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 {
+	FString Data = "";
+	ADataTranslate_Mc_Lf::PcData = FPCData_Mc_Lf();
+
+	if (ATcpClient_Mc_Lf::bIsConnected)
+	{
+		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
+	}
+	else
+	{
+		ATcpClient_Mc_Lf::LastTcpSocketData = "";
+		// PcData = FPCData_Mc_Lf();
+	}
+	// if (ADataTranslate_Mc_Lf::LastPreviousTcpSocketData != Data || Data == "")
+	// {
+	// 	ADataTranslate_Mc_Lf::LastPreviousTcpSocketData = Data;
+	// 	PcData = FPCData_Mc_Lf();
+	// }
+
+	ADataTranslate_Mc_Lf::CreatePCData(ADataTranslate_Mc_Lf::PcData, Data);
+
 	if (!ADataTranslate_Mc_Lf::PcData.CpuLoadThreads.Num())
 	{
 		return;
@@ -481,6 +501,17 @@ void UWidgetMainMenu_Mc_Lf::ResetGraph(FGraph_Mc_Lf& Graph)
 		}
 	}
 	Graph.Graph.Empty();
+
+	FLinearColor FillColor = Graph.FillColor;
+	FLinearColor HighLineColor = Graph.HighLineColor;
+	FLinearColor LowLineColor = Graph.LowLineColor;
+	FLinearColor LineColorOverride = Graph.LineColorOverride;
+
+	Graph = FGraph_Mc_Lf();
+	Graph.FillColor = FillColor;
+	Graph.HighLineColor = HighLineColor;
+	Graph.LowLineColor = LowLineColor;
+	Graph.LineColorOverride = LineColorOverride;
 }
 
 void UWidgetMainMenu_Mc_Lf::InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints, const int32 NumLines,
@@ -625,10 +656,9 @@ void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMi
 				IsValid(LabelWidget))
 			{
 				Line.Label = Cast<UWidgetHardwareLabel_Mc_Lf>(LabelWidget);
-				Parent->AddChildToVerticalBox(Line.Label);
+				const TObjectPtr<UVerticalBoxSlot> LabelSlot = Parent->AddChildToVerticalBox(Line.Label);
 
-				if (const TObjectPtr<UVerticalBoxSlot> LabelSlot = Cast<UVerticalBoxSlot>(Line.Label->Slot); IsValid(
-					LabelSlot))
+				if (IsValid(LabelSlot))
 				{
 					FMargin LabelPadding = LabelSlot->GetPadding();
 					LabelPadding.Bottom = 5;
@@ -656,7 +686,7 @@ void UWidgetMainMenu_Mc_Lf::InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMi
 
 void UWidgetMainMenu_Mc_Lf::AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data,
                                           const EPrecisionPoint& Precision,
-                                          const TObjectPtr<UVerticalBox>& Parent) const
+                                          const TObjectPtr<UVerticalBox>& Parent)
 {
 	if (!Data.Num())
 	{
@@ -665,34 +695,43 @@ void UWidgetMainMenu_Mc_Lf::AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDat
 
 	InitLabels(Graph, Data, Parent);
 
+	// if (Data.Num() != Graph.Graph.Num())
+	// {
+	// 	ResetGraph(Graph);
+	// 	return;
+	// }
+
 	const int32 NumGraphLines = Graph.Graph.Num();
 	for (int32 i = 0; i < NumGraphLines; ++i)
 	{
-		const FShapedLine_Mc_Lf& Line = Graph.Graph[i];
-		const FDataMinMaxCurrent_Mc_Lf& Value = Data[i];
-
-		if (IsValid(Line.Label))
+		if (Data.IsValidIndex(i))
 		{
-			if (IsValid(Line.Label->ValueText))
+			const FShapedLine_Mc_Lf& Line = Graph.Graph[i];
+			const FDataMinMaxCurrent_Mc_Lf& Value = Data[i];
+
+			if (IsValid(Line.Label))
 			{
-				FString Text;
-				const double WantedValue = Value.GetCurrent();
-				switch (Precision)
+				if (IsValid(Line.Label->ValueText))
 				{
-				case EPrecisionPoint::One:
-					Text = ADataTranslate_Mc_Lf::FormatDoubleWithOneDecimal(WantedValue);
-					break;
-				case EPrecisionPoint::Two:
-					Text = ADataTranslate_Mc_Lf::FormatDoubleWithTwoDecimals(WantedValue);
-					break;
-				case EPrecisionPoint::Zero:
-					Text = ADataTranslate_Mc_Lf::FormatDoubleWithoutDecimals(WantedValue);
-					break;
-				default:
-					Text = ADataTranslate_Mc_Lf::FormatDoubleWithoutDecimals(WantedValue);
-					break;
+					FString Text;
+					const double WantedValue = Value.GetCurrent();
+					switch (Precision)
+					{
+					case EPrecisionPoint::One:
+						Text = ADataTranslate_Mc_Lf::FormatDoubleWithOneDecimal(WantedValue);
+						break;
+					case EPrecisionPoint::Two:
+						Text = ADataTranslate_Mc_Lf::FormatDoubleWithTwoDecimals(WantedValue);
+						break;
+					case EPrecisionPoint::Zero:
+						Text = ADataTranslate_Mc_Lf::FormatDoubleWithoutDecimals(WantedValue);
+						break;
+					default:
+						Text = ADataTranslate_Mc_Lf::FormatDoubleWithoutDecimals(WantedValue);
+						break;
+					}
+					Line.Label->ValueText->SetText(FText::FromString(Text));
 				}
-				Line.Label->ValueText->SetText(FText::FromString(Text));
 			}
 		}
 	}

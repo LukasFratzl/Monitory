@@ -389,7 +389,7 @@ public:
 
 	// void ResetLabels(FGraph_Mc_Lf& Graph);
 	void InitLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const TObjectPtr<UVerticalBox>& Parent) const;
-	void AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const EPrecisionPoint& Precision, const TObjectPtr<UVerticalBox>& Parent) const;
+	void AdvanceLabels(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, const EPrecisionPoint& Precision, const TObjectPtr<UVerticalBox>& Parent);
 
 	FVector2D AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<FDataMinMaxCurrent_Mc_Lf>& Data, bool bIsRelativeGraph, const FLinearColor& FillAreaColor, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
 

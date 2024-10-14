@@ -19,7 +19,7 @@ void ASettings_Mc_Lf::BeginPlay()
 	Super::BeginPlay();
 
 #if PLATFORM_DESKTOP
-	Set3DWorldEnabled(false);
+	//Set3DWorldEnabled(false);
 #endif
 	SetShowMouseEnabled(true);
 }

@@ -33,25 +33,25 @@ public:
 		int32 Index = 0;
 		for (int32 i = NumPoints - 1; i >= 0; --i)
 		{
-			FVector2f PointA = Points[Index];
-			if (Index)
-			{
-				PointA = Points[Index - 1];
-			}
-			FVector2f PointB = Points[Index];
-			if (Index < NumPoints - 1)
-			{
-				PointB = Points[Index + 1];
-			}
-			FVector2f Direction = FVector2f(1, 0);
-			if (PointA != PointB)
-			{
-				Direction = PointB - PointA;
-			}
-			const FQuat2f& Rotation = FQuat2f(FMath::DegreesToRadians(-90));
+			// FVector2f PointA = Points[Index];
+			// if (Index)
+			// {
+			// 	PointA = Points[Index - 1];
+			// }
+			// FVector2f PointB = Points[Index];
+			// if (!Index/*Index < NumPoints - 1*/)
+			// {
+			// 	PointB = Points[Index + 1];
+			// }
+			// FVector2f Direction = FVector2f(1, 0);
+			// if (PointA != PointB)
+			// {
+			// 	Direction = PointB - PointA;
+			// }
+			// const FQuat2f& Rotation = FQuat2f(FMath::DegreesToRadians(-90));
 			constexpr int32 LineThickness = 3;
-			const FVector2f& Border = Rotation.TransformVector(Direction).GetSafeNormal() * LineThickness;
-			LinePoints[NumPoints + i] = Points[Index] + Border;
+			// const FVector2f& Border = Rotation.TransformVector(Direction).GetSafeNormal() * LineThickness;
+			LinePoints[NumPoints + i] = Points[Index] + FVector2f(0, LineThickness);
 			Index++;
 		}
 	}

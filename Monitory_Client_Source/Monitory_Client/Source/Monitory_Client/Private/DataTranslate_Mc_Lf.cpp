@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "DataTranslate_Mc_Lf.h"
@@ -11,7 +11,7 @@
 ADataTranslate_Mc_Lf::ADataTranslate_Mc_Lf()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.TickInterval = 0.1f;
 }
 
@@ -55,18 +55,25 @@ void ADataTranslate_Mc_Lf::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FString Data = "";
-
-	if (ATcpClient_Mc_Lf::bIsConnected)
-	{
-		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
-	}
-	else
-	{
-		ATcpClient_Mc_Lf::LastTcpSocketData = "";
-	}
-
-	CreatePCData(PcData, Data);
+	// FString Data = "";
+	// PcData = FPCData_Mc_Lf();
+	//
+	// if (ATcpClient_Mc_Lf::bIsConnected)
+	// {
+	// 	Data = ATcpClient_Mc_Lf::LastTcpSocketData;
+	// }
+	// else
+	// {
+	// 	ATcpClient_Mc_Lf::LastTcpSocketData = "";
+	// 	// PcData = FPCData_Mc_Lf();
+	// }
+	// // if (ADataTranslate_Mc_Lf::LastPreviousTcpSocketData != Data || Data == "")
+	// // {
+	// // 	ADataTranslate_Mc_Lf::LastPreviousTcpSocketData = Data;
+	// // 	PcData = FPCData_Mc_Lf();
+	// // }
+	//
+	// CreatePCData(PcData, Data);
 
 	//FPlatformProcess::Sleep(UWidgetMainMenu_Mc_Lf::LastUpdateRateSeconds);
 }
