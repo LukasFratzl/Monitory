@@ -182,7 +182,7 @@ public:
 
 	//inline static double LastUpdateRateSeconds = 0.3;
 
-	//double UpdateRateRuntime = 0;
+	double PCDataUpdateRateRuntime = 0;
 
 	UPROPERTY(EditAnywhere)
 	FGraph_Mc_Lf CpuUtilizationGraph;

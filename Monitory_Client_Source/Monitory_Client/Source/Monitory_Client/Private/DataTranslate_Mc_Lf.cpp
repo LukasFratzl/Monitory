@@ -12,7 +12,7 @@ ADataTranslate_Mc_Lf::ADataTranslate_Mc_Lf()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	PrimaryActorTick.TickInterval = 0.1f;
+	PrimaryActorTick.TickInterval = 0.2f;
 }
 
 // Called when the game starts or when spawned

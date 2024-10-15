@@ -278,27 +278,34 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 
 void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 {
-	FString Data = "";
-	ADataTranslate_Mc_Lf::PcData = FPCData_Mc_Lf();
 
-	if (ATcpClient_Mc_Lf::bIsConnected)
+	PCDataUpdateRateRuntime -= DeltaTime;
+	if (PCDataUpdateRateRuntime < 0)
 	{
-		// UE_LOG(LogTemp, Display, TEXT("Connected"));
-		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
-	}
-	else
-	{
-		// UE_LOG(LogTemp, Display, TEXT("Not Connected"));
-		ATcpClient_Mc_Lf::LastTcpSocketData = "";
-		// PcData = FPCData_Mc_Lf();
-	}
-	// if (ADataTranslate_Mc_Lf::LastPreviousTcpSocketData != Data || Data == "")
-	// {
-	// 	ADataTranslate_Mc_Lf::LastPreviousTcpSocketData = Data;
-	// 	PcData = FPCData_Mc_Lf();
-	// }
+		PCDataUpdateRateRuntime = 0.2f;
 
-	ADataTranslate_Mc_Lf::CreatePCData(ADataTranslate_Mc_Lf::PcData, Data);
+		FString Data = "";
+		ADataTranslate_Mc_Lf::PcData = FPCData_Mc_Lf();
+
+		if (ATcpClient_Mc_Lf::bIsConnected)
+		{
+			// UE_LOG(LogTemp, Display, TEXT("Connected"));
+			Data = ATcpClient_Mc_Lf::LastTcpSocketData;
+		}
+		else
+		{
+			// UE_LOG(LogTemp, Display, TEXT("Not Connected"));
+			ATcpClient_Mc_Lf::LastTcpSocketData = "";
+			// PcData = FPCData_Mc_Lf();
+		}
+		// if (ADataTranslate_Mc_Lf::LastPreviousTcpSocketData != Data || Data == "")
+		// {
+		// 	ADataTranslate_Mc_Lf::LastPreviousTcpSocketData = Data;
+		// 	PcData = FPCData_Mc_Lf();
+		// }
+
+		ADataTranslate_Mc_Lf::CreatePCData(ADataTranslate_Mc_Lf::PcData, Data);
+	}
 
 	if (!ADataTranslate_Mc_Lf::PcData.CpuLoadThreads.Num())
 	{

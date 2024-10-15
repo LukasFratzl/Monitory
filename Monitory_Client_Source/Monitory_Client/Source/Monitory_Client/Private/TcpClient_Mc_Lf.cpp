@@ -6,7 +6,7 @@ ATcpClient_Mc_Lf::ATcpClient_Mc_Lf()
 {
 	// Set this actor to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.05f;
+	PrimaryActorTick.TickInterval = 0.2f;
 }
 
 void ATcpClient_Mc_Lf::BeginPlay()
