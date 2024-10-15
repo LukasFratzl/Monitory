@@ -82,7 +82,7 @@ namespace Monitory_Server_Linux
                                 {
                                     string file1 = Path.Combine(Directory.GetCurrentDirectory(), "turbostat_info1.txt");
                                     string trimCommand =
-                                        $"-c \"tail -n 10 '{file}' > '{file1}' && mv '{file1}' '{file}' --force \"";
+                                        $"-c \"tail -n 200 '{file}' > '{file1}' && mv '{file1}' '{file}' --force \"";
                                     //string trimCmd = $"-c \" echo \"$(tail -n 10 '{file}')\" > '{file}' \"";
                                     //string trimCommand = "echo \"$(tail -n 10 " + AddQuote() + file + AddQuote() + ") > " + AddQuote() + file + AddQuote();
                                     RunCommand("bash", trimCommand);
@@ -94,7 +94,7 @@ namespace Monitory_Server_Linux
 
                                 // Console.WriteLine("Stats File at: " + file);
                                 string command =
-                                    "turbostat --quiet --interval=1 --num_iterations=100 --Summary --show Busy%,PkgWatt,PkgTmp -out=" +
+                                    "turbostat --quiet --interval=0.2 --num_iterations=100 --show Busy%,PkgWatt,PkgTmp -out=" +
                                     AddQuote() + file + AddQuote();
                                 _lastCpuUtilString =
                                     RunCommand("bash", "-c " + AddQuote() + command + AddQuote());
@@ -117,24 +117,24 @@ namespace Monitory_Server_Linux
 
                 try
                 {
-                    if (!_cpuUtilThreadRunning)
-                    {
-                        _cpuUtilThreadRunning = true;
-                        Thread thread = new Thread(() =>
-                        {
-                            try
-                            {
-                                _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                            }
-
-                            _cpuUtilThreadRunning = false;
-                        });
-                        thread.Start();
-                    }
+                    // if (!_cpuUtilThreadRunning)
+                    // {
+                    //     _cpuUtilThreadRunning = true;
+                    //     Thread thread = new Thread(() =>
+                    //     {
+                    //         try
+                    //         {
+                    //             _lastCpuUtilString = RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
+                    //         }
+                    //         catch (Exception e)
+                    //         {
+                    //             Console.WriteLine(e);
+                    //         }
+                    //
+                    //         _cpuUtilThreadRunning = false;
+                    //     });
+                    //     thread.Start();
+                    // }
 
                     if (!_drivesThreadRunning)
                     {
@@ -298,15 +298,14 @@ namespace Monitory_Server_Linux
             string dateNow = $"Date_Now:{DateTime.Now.ToShortDateString()}:0:0:0|";
             data += dateNow;
 
-            CollectCpuLoadAndClockData(ref data, CommandsOutput);
+            //CollectCpuLoadAndClockData(ref data, CommandsOutput);
+            CollectCpuData(ref data, CommandsOutput);
 
             CollectMemoryData(ref data, CommandsOutput);
 
             CollectStorageData(ref data);
 
             CollectNetworkData(ref data);
-
-            CollectCpuData(ref data, CommandsOutput);
 
             CollectGpuData(ref data, CommandsOutput);
 
@@ -349,104 +348,6 @@ namespace Monitory_Server_Linux
             }
 
             return output;
-        }
-
-
-        public static void CollectCpuLoadAndClockData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
-        {
-            // string utilityString = _lastCpuUtilString;//RunCommand("bash", "-c \"mpstat -P ALL 1 1\"");
-
-            if (_lastCpuUtilString == "")
-            {
-                string line = $"Cpu_Utility:Total:0:0:100|";
-                properties += line;
-
-                string line1 = $"Cpu_Utility:0:0:0:100|";
-                properties += line1;
-                return;
-            }
-
-            //Console.WriteLine(utilityString);
-
-            string[] splittedUtilityString = _lastCpuUtilString.Split(new[] { Environment.NewLine },
-                StringSplitOptions.RemoveEmptyEntries);
-
-            if (splittedUtilityString.Length > 2)
-            {
-                string[] allCpuRow = splittedUtilityString[2].Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    ;
-                //string utilityValue = allCpuRow[allCpuRow.Length - 1].Replace(',', '.');
-                float parseValue = 0;
-                float.TryParse(allCpuRow[allCpuRow.Length - 1].Replace(',', '.'), out parseValue);
-
-                float allUtility = 100f - parseValue;
-
-                string line = $"Cpu_Utility:Total:{allUtility}:0:100|";
-                properties += line;
-            }
-
-            // int lastValidIndex = 3;
-            int threadIndex = 0;
-            while (splittedUtilityString.Length > threadIndex + 3)
-            {
-                string[] cpuRow = splittedUtilityString[3 + threadIndex]
-                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    ;
-
-
-                if (cpuRow[0][0] == 'A')
-                {
-                    break;
-                }
-
-                // Console.WriteLine(ultilitystrings[ultilitystrings.Length - 1]);
-                float parseValue = 0;
-                float.TryParse(cpuRow[cpuRow.Length - 1].Replace(',', '.'), out parseValue);
-
-                float utility = 100f - parseValue;
-
-                string line = $"Cpu_Utility:{threadIndex}:{utility}:0:100|";
-                properties += line;
-
-                //lastValidIndex ++;
-                threadIndex++;
-            }
-
-
-            // string mhzString = RunCommand("bash", "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
-            string mhzString = "";
-            _commandsOutput.TryGetValue(Commands.CPU_MHZ_STR, out mhzString);
-
-            if (mhzString == null)
-            {
-                mhzString = "";
-            }
-
-            string[] splittedMhzString = mhzString.Split(new[] { Environment.NewLine },
-                StringSplitOptions.RemoveEmptyEntries);
-
-            int mhzThreadIdx = 0;
-            float averageMhz = -1f;
-            foreach (var mhz in splittedMhzString)
-            {
-                float mhzFloat = 0;
-                float.TryParse(mhz.Replace(',', '.'), out mhzFloat);
-
-                string line = $"Cpu_Clock:{mhzThreadIdx}:{mhzFloat}:0:100|";
-                properties += line;
-
-                if (averageMhz < -0.5f)
-                {
-                    averageMhz = mhzFloat;
-                }
-                else
-                {
-                    averageMhz = (averageMhz + mhzFloat) * 0.5f;
-                }
-            }
-
-            string cpuClockTotal = $"Cpu_Clock:Total:{averageMhz}:0:100|";
-            properties += cpuClockTotal;
         }
 
         public static void CollectMemoryData(ref string properties,
@@ -600,92 +501,138 @@ namespace Monitory_Server_Linux
             float pkgTmp = 0.0f;
             float pkgWatt = 0.0f;
 
+            bool foundTmp = false;
+
             string[] stat_file = File.ReadAllLines(file);
             if (stat_file.Length > 0)
             {
-                string[] info_lines = stat_file.Last().Trim()
-                    .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (info_lines.Length >= 3)
+                for (int idx = stat_file.Length - 1; idx >= 0; idx--)
                 {
+                    string[] info_lines = stat_file[idx].Trim()
+                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    float dummy = 0;
+                    // We are at the description of the values
+                    if (!float.TryParse(info_lines[0].Replace(',', '.'), out dummy) && idx < stat_file.Length - 1)
+                    {
+                        string[] info_lines_overall = stat_file[idx + 1].Trim()
+                            .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                        for (int col = 0; col < info_lines.Length; col++)
+                        {
+                            if (info_lines[col].ToLower().Contains("pkgtmp"))
+                            {
+                                float tmp = 0.0f;
+                                float.TryParse(info_lines_overall[col].Replace(',', '.'), out tmp);
+                                if (tmp == 0.0f)
+                                {
+                                    pkgTmp = _currentCpuTemp;
+                                    foundTmp = true;
+                                }
+                                else
+                                {
+                                    pkgTmp = tmp;
+                                    _currentCpuTemp = tmp;
+                                    foundTmp = true;
+                                }
+                            }
+
+                            if (info_lines[col].ToLower().Contains("pkgwatt"))
+                            {
+                                float watt = 0.0f;
+                                float.TryParse(info_lines_overall[col].Replace(',', '.'), out watt);
+                                if (watt == 0.0f)
+                                {
+                                    pkgWatt = _currentCpuWatt;
+                                }
+                                else
+                                {
+                                    pkgWatt = watt;
+                                    _currentCpuWatt = watt;
+                                }
+                            }
+
+
+                            if (info_lines[col].ToLower().Contains("busy"))
+                            {
+                                float avg = 0.0f;
+                                float.TryParse(info_lines_overall[col].Replace(',', '.'), out avg);
+
+                                string avgLine = $"Cpu_Utility:Total:{avg}:0:100|";
+                                properties += avgLine;
+
+                                int threadIndex = 0;
+                                for (int threadIdx = idx + 2; threadIdx < stat_file.Length; threadIdx++)
+                                {
+                                    string[] info_lines_thread = stat_file[threadIdx].Trim()
+                                        .Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                    if (info_lines_thread[col].ToLower().Contains("busy"))
+                                    {
+                                        break;
+                                    }
+
+                                    if (info_lines_thread.Length > col)
+                                    {
+                                        float threadLoad = 0.0f;
+                                        float.TryParse(info_lines_thread[col].Replace(',', '.'), out threadLoad);
+
+                                        string line = $"Cpu_Utility:{threadIndex}:{threadLoad}:0:100|";
+                                        properties += line;
+                                    }
+                                    threadIndex++;
+                                }
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+            if (!foundTmp)
+            {
+                string sensors = RunCommand("bash", "-c \"sensors\"");
+
+                string[] sensorLines = sensors.Split(new[] { Environment.NewLine },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                if (sensorLines.Length > 0)
+                {
+                    bool found = false;
                     float tmp = 0.0f;
-                    float.TryParse(info_lines[1].Replace(',', '.'), out tmp);
+                    for (int i = 0; i < sensorLines.Length; i++)
+                    {
+                        if (sensorLines[i].Contains("k10temp"))
+                        {
+                            found = true;
+                        }
+
+                        if (found && (sensorLines[i].ToLower().Contains("tctl") ||
+                                      sensorLines[i].ToLower().Contains("tdie")))
+                        {
+                            string pattern = @"\d+\.\d+";
+                            MatchCollection matches = Regex.Matches(sensorLines[i], pattern);
+
+                            if (matches.Count > 0)
+                            {
+                                float.TryParse(matches[0].Value.Replace(',', '.'), out tmp);
+                            }
+
+                            break;
+                        }
+                    }
+
                     if (tmp == 0.0f)
                     {
                         pkgTmp = _currentCpuTemp;
+                        foundTmp = true;
                     }
                     else
                     {
                         pkgTmp = tmp;
                         _currentCpuTemp = tmp;
-                    }
-
-                    float watt = 0.0f;
-                    float.TryParse(info_lines[2].Replace(',', '.'), out watt);
-                    if (watt == 0.0f)
-                    {
-                        pkgWatt = _currentCpuWatt;
-                    }
-                    else
-                    {
-                        pkgWatt = watt;
-                        _currentCpuWatt = watt;
-                    }
-                }
-                else if (info_lines.Length == 2)
-                {
-                    string sensors = RunCommand("bash", "-c \"sensors\"");
-
-                    string[] sensorLines = sensors.Split(new[] { Environment.NewLine },
-                        StringSplitOptions.RemoveEmptyEntries);
-
-                    if (sensorLines.Length > 0)
-                    {
-                        bool found = false;
-                        float tmp = 0.0f;
-                        for (int i = 0; i < sensorLines.Length; i++)
-                        {
-                            if (sensorLines[i].Contains("k10temp"))
-                            {
-                                found = true;
-                            }
-
-                            if (found && (sensorLines[i].ToLower().Contains("tctl") ||
-                                          sensorLines[i].ToLower().Contains("tdie")))
-                            {
-                                string pattern = @"\d+\.\d+";
-                                MatchCollection matches = Regex.Matches(sensorLines[i], pattern);
-
-                                if (matches.Count > 0)
-                                {
-                                    float.TryParse(matches[0].Value.Replace(',', '.'), out tmp);
-                                }
-
-                                break;
-                            }
-                        }
-
-                        if (tmp == 0.0f)
-                        {
-                            pkgTmp = _currentCpuTemp;
-                        }
-                        else
-                        {
-                            pkgTmp = tmp;
-                            _currentCpuTemp = tmp;
-                        }
-                    }
-
-                    float watt = 0.0f;
-                    float.TryParse(info_lines[1].Replace(',', '.'), out watt);
-                    if (watt == 0.0f)
-                    {
-                        pkgWatt = _currentCpuWatt;
-                    }
-                    else
-                    {
-                        pkgWatt = watt;
-                        _currentCpuWatt = watt;
+                        foundTmp = true;
                     }
                 }
             }
@@ -702,6 +649,41 @@ namespace Monitory_Server_Linux
 
             properties += $"Wattage:{name}:{pkgWatt}:0:100|";
             properties += $"Temperature:{name}:{pkgTmp}:0:100|";
+
+            // string mhzString = RunCommand("bash", "-c \"cat /proc/cpuinfo | grep 'MHz' | uniq | awk '{print $4}'\"");
+            string mhzString = "";
+            _commandsOutput.TryGetValue(Commands.CPU_MHZ_STR, out mhzString);
+
+            if (mhzString == null)
+            {
+                mhzString = "";
+            }
+
+            string[] splittedMhzString = mhzString.Split(new[] { Environment.NewLine },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            int mhzThreadIdx = 0;
+            float averageMhz = -1f;
+            foreach (var mhz in splittedMhzString)
+            {
+                float mhzFloat = 0;
+                float.TryParse(mhz.Replace(',', '.'), out mhzFloat);
+
+                string line = $"Cpu_Clock:{mhzThreadIdx}:{mhzFloat}:0:100|";
+                properties += line;
+
+                if (averageMhz < -0.5f)
+                {
+                    averageMhz = mhzFloat;
+                }
+                else
+                {
+                    averageMhz = (averageMhz + mhzFloat) * 0.5f;
+                }
+            }
+
+            string cpuClockTotal = $"Cpu_Clock:Total:{averageMhz}:0:100|";
+            properties += cpuClockTotal;
         }
 
         public static void CollectGpuData(ref string properties, ConcurrentDictionary<Commands, string> _commandsOutput)
