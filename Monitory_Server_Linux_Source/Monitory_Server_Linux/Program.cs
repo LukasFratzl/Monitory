@@ -203,7 +203,7 @@ namespace Monitory_Server_Linux
                     Console.WriteLine(e);
                 }
 
-                Thread.Sleep(300);
+                Thread.Sleep(50);
             }
 
             Console.WriteLine("Press any key to exit...");
@@ -246,7 +246,7 @@ namespace Monitory_Server_Linux
                     byte[] hiBytes = Encoding.Default.GetBytes(hiMessage);
                     ns.Write(hiBytes, 0, hiBytes.Length);
 
-                    Thread.Sleep(300);
+                    Thread.Sleep(50);
                 }
             }
             catch (Exception)
@@ -309,6 +309,9 @@ namespace Monitory_Server_Linux
             CollectCpuData(ref data, CommandsOutput);
 
             CollectGpuData(ref data, CommandsOutput);
+
+            // Very Important to send a char on the end of the message to allow the client to detect when the message ends
+            data += "!";
 
             return data;
         }

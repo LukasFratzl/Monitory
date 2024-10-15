@@ -138,7 +138,7 @@ namespace Monitory_Server_Windows
                     byte[] hiBytes = Encoding.Default.GetBytes(hiMessage);
                     ns.Write(hiBytes, 0, hiBytes.Length);
 
-                    Thread.Sleep(300);
+                    Thread.Sleep(50);
                 }
             }
             catch (Exception)
@@ -229,7 +229,7 @@ namespace Monitory_Server_Windows
             while (!bNeedExit)
             {
                 _dataToSend = CollectData();
-                Thread.Sleep(300);
+                Thread.Sleep(50);
             }
 
             Console.WriteLine("Press any key to exit...");
@@ -417,6 +417,8 @@ namespace Monitory_Server_Windows
                     $"Upload_Speed:{uploadValue.Key}:{uploadValue.Value.X}:{uploadValue.Value.Y}:{uploadValue.Value.Z}|";
                 properties += upload;
             }
+
+            properties += "!";
 
             return properties;
         }

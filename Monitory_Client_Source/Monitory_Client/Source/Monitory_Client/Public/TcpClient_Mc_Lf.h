@@ -43,9 +43,6 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-public:
-	// UE::Tasks::FTask TcpSocketTask;
-	// bool bNeedRunTcpTask = false;
 	
 	//int32 IPAddressIndex = 0;
 	
@@ -54,6 +51,7 @@ public:
 	inline static FString LastTcpSocketData = FString("");
 
 	inline static bool bNeedUIRebuild = false;
+	inline static float RebuildTimer = 0.5f;
 	inline static bool bIsConnected = false;
 
 	inline static EIsConnectedOverride EIsConnectedOverride = EIsConnectedOverride::NONE;

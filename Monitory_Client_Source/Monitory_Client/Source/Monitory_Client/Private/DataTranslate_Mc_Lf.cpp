@@ -91,8 +91,16 @@ void ADataTranslate_Mc_Lf::CreatePCData(FPCData_Mc_Lf& FromData, const FString& 
 	TArray<FDataMinMaxCurrent_Mc_Lf> DownloadSpeedRaw;
 	TArray<FDataMinMaxCurrent_Mc_Lf> UploadSpeedRaw;
 
+	TArray<FString> SeparatorArray;
+	FromString.ParseIntoArray(SeparatorArray, TEXT("!"), false);
+
+	if (FromString.IsEmpty() || !SeparatorArray.Num())
+	{
+		return;
+	}
+
 	TArray<FString> DataArray;
-	FromString.ParseIntoArray(DataArray, TEXT("|"), false);
+	SeparatorArray[0].ParseIntoArray(DataArray, TEXT("|"), false);
 
 	for (const FString& Entry : DataArray)
 	{

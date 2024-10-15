@@ -213,6 +213,17 @@ void UWidgetMainMenu_Mc_Lf::TickComponent(float DeltaTime)
 			}
 		}
 	}
+
+	if (ATcpClient_Mc_Lf::bNeedUIRebuild)
+	{
+		ATcpClient_Mc_Lf::RebuildTimer -= DeltaTime;
+		if (ATcpClient_Mc_Lf::RebuildTimer <= 0)
+		{
+			ATcpClient_Mc_Lf::RebuildTimer = 0.5f;
+			ATcpClient_Mc_Lf::bNeedUIRebuild = false;
+			ResetMonitorPanel();
+		}
+	}
 }
 
 bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
@@ -236,8 +247,6 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 						if (IsValid(IPAddressWidget->IPAddressText))
 						{
 							IPAddressWidget->IPAddressText->SetText(FText::FromString(IPAddress));
-
-
 						}
 					}
 				}
@@ -262,37 +271,7 @@ bool UWidgetMainMenu_Mc_Lf::TickIPSelectionPanel(float DeltaTime)
 		DateNowTextBlock_Client->SetText(FText::FromString(FDateTime::Now().ToString(TEXT("%d/%m/%Y"))));
 	}
 
-	// CPU -> Start
-	ResetGraph(CpuUtilizationGraph);
-	// CPU -> End
-
-	// RAM -> Start
-	ResetGraph(CpuRamUtilizationGraph);
-	// RAM -> End
-
-	// Gpu -> Start
-	ResetGraph(GpuUtilizationGraph);
-
-	// GPU RAM -> Start
-	ResetGraph(GpuRamUtilizationGraph);
-	// GPU RAM -> End
-	// Gpu -> End
-
-	// Wattage -> Start
-	ResetGraph(WattageUtilizationGraph);
-	// Wattage -> End
-
-	// Temperature -> Start
-	ResetGraph(TemperatureUtilizationGraph);
-	// Temperature -> End
-
-	// Drive -> Start
-	ResetGraph(DriveUtilizationGraph);
-	// Drive -> End
-
-	// Net -> Start
-	ResetGraph(NetUtilizationGraph);
-	// Net -> End
+	ResetMonitorPanel();
 
 	return bInitThisFrame;
 }
@@ -304,10 +283,12 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 
 	if (ATcpClient_Mc_Lf::bIsConnected)
 	{
+		// UE_LOG(LogTemp, Display, TEXT("Connected"));
 		Data = ATcpClient_Mc_Lf::LastTcpSocketData;
 	}
 	else
 	{
+		// UE_LOG(LogTemp, Display, TEXT("Not Connected"));
 		ATcpClient_Mc_Lf::LastTcpSocketData = "";
 		// PcData = FPCData_Mc_Lf();
 	}
@@ -332,7 +313,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceGraph(CpuUtilizationGraph, ADataTranslate_Mc_Lf::PcData.CpuLoadThreads, false, CpuFillColor,
 	             CpuUtilizationCanvasPanel);
 
-	AdvanceText(CpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuLoadTotal.GetCurrent(), EPrecisionPoint::Zero,
+	AdvanceText(CpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuLoadTotal.GetCurrent(),
+	            EPrecisionPoint::Zero,
 	            TEXT("{0} %"));
 	AdvanceText(CpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.CpuClockSpeedTotal.GetCurrent() / 1000,
 	            EPrecisionPoint::Two, TEXT("{0} GHz"));
@@ -346,7 +328,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	             CpuRamFillColor,
 	             CpuRamUtilizationCanvasPanel);
 
-	AdvanceText(CpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamUsed.GetCurrent(), EPrecisionPoint::Two,
+	AdvanceText(CpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamUsed.GetCurrent(),
+	            EPrecisionPoint::Two,
 	            TEXT("{0} GB"));
 	AdvanceText(CpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.CpuRamPercentage.GetCurrent(),
 	            EPrecisionPoint::Zero, TEXT("{0} %"));
@@ -362,7 +345,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceGraph(GpuUtilizationGraph, TArray<FDataMinMaxCurrent_Mc_Lf>{ADataTranslate_Mc_Lf::PcData.GpuLoadTotal},
 	             false, GpuUtilFillColor, GpuUtilizationCanvasPanel);
 
-	AdvanceText(GpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuLoadTotal.GetCurrent(), EPrecisionPoint::Zero,
+	AdvanceText(GpuUtilizationTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuLoadTotal.GetCurrent(),
+	            EPrecisionPoint::Zero,
 	            TEXT("{0} %"));
 	AdvanceText(GpuClockTotalTextBlock, ADataTranslate_Mc_Lf::PcData.GpuClockSpeedTotal.GetCurrent() / 1000,
 	            EPrecisionPoint::Two, TEXT("{0} GHz"));
@@ -375,7 +359,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	             GpuRamFillColor,
 	             GpuRamUtilizationCanvasPanel);
 
-	AdvanceText(GpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamUsed.GetCurrent(), EPrecisionPoint::Two,
+	AdvanceText(GpuRamUtilizationGBTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamUsed.GetCurrent(),
+	            EPrecisionPoint::Two,
 	            TEXT("{0} GB"));
 	AdvanceText(GpuRamUtilizationPercentageTextBlock, ADataTranslate_Mc_Lf::PcData.GpuRamPercentage.GetCurrent(),
 	            EPrecisionPoint::Zero, TEXT("{0} %"));
@@ -392,7 +377,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	                                           WattageCanvasPanel);
 
 	AdvanceText(WattageValueMaxTextBlock, MaxWattage.X, EPrecisionPoint::Zero, TEXT("{0} Max"));
-	AdvanceText(WattageValueTextBlock, ADataTranslate_Mc_Lf::PcData.WattageTotalCurrent.GetCurrent(), EPrecisionPoint::Zero,
+	AdvanceText(WattageValueTextBlock, ADataTranslate_Mc_Lf::PcData.WattageTotalCurrent.GetCurrent(),
+	            EPrecisionPoint::Zero,
 	            TEXT("{0} W"));
 	AdvanceText(WattageValue_100PercentTextBlock, MaxWattage.Y * 1.25f, EPrecisionPoint::Zero, TEXT("{0}"));
 	AdvanceText(WattageValue_50PercentTextBlock, MaxWattage.Y * 0.5 * 1.25f, EPrecisionPoint::Zero, TEXT("{0}"));
@@ -448,7 +434,8 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 	AdvanceText(NetMaxSpeed_100PercentTextBlock, MaxSpeed.Y * 1.25f, EPrecisionPoint::Two, TEXT("{0}"));
 	AdvanceText(NetMaxSpeed_50PercentTextBlock, MaxSpeed.Y * 0.5 * 1.25f, EPrecisionPoint::Two, TEXT("{0}"));
 
-	AdvanceText(NetMaxDownSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.DownloadMaxSpeed.GetCurrent(), EPrecisionPoint::Two,
+	AdvanceText(NetMaxDownSpeedTextBlock, ADataTranslate_Mc_Lf::PcData.DownloadMaxSpeed.GetCurrent(),
+	            EPrecisionPoint::Two,
 	            TEXT("{0} MB/s"));
 	if (IsValid(NetMaxDownSpeedTextBlock))
 	{
@@ -462,6 +449,41 @@ void UWidgetMainMenu_Mc_Lf::TickMonitoringPanel(float DeltaTime)
 		NetMaxUpSpeedTextBlock->SetColorAndOpacity(ADataTranslate_Mc_Lf::PcData.UploadMaxSpeed.Color);
 	}
 
+	// Net -> End
+}
+
+void UWidgetMainMenu_Mc_Lf::ResetMonitorPanel()
+{
+	// CPU -> Start
+	ResetGraph(CpuUtilizationGraph);
+	// CPU -> End
+
+	// RAM -> Start
+	ResetGraph(CpuRamUtilizationGraph);
+	// RAM -> End
+
+	// Gpu -> Start
+	ResetGraph(GpuUtilizationGraph);
+
+	// GPU RAM -> Start
+	ResetGraph(GpuRamUtilizationGraph);
+	// GPU RAM -> End
+	// Gpu -> End
+
+	// Wattage -> Start
+	ResetGraph(WattageUtilizationGraph);
+	// Wattage -> End
+
+	// Temperature -> Start
+	ResetGraph(TemperatureUtilizationGraph);
+	// Temperature -> End
+
+	// Drive -> Start
+	ResetGraph(DriveUtilizationGraph);
+	// Drive -> End
+
+	// Net -> Start
+	ResetGraph(NetUtilizationGraph);
 	// Net -> End
 }
 
@@ -815,7 +837,8 @@ FVector2D UWidgetMainMenu_Mc_Lf::AdvanceGraph(FGraph_Mc_Lf& Graph, const TArray<
 			if (bIsRelativeGraph)
 			{
 				const double Percentage = Line.ValueHistory[p] / MaxValuePerUnit;
-				Location.Y = Graph.CurrentCanvasSize.Y - Graph.CurrentCanvasSize.Y * Percentage * 0.75f; // 0.75f for better view
+				Location.Y = Graph.CurrentCanvasSize.Y - Graph.CurrentCanvasSize.Y * Percentage * 0.75f;
+				// 0.75f for better view
 			}
 			Points[p] = Location;
 		}

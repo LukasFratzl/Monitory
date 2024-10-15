@@ -384,6 +384,8 @@ public:
 	bool TickIPSelectionPanel(float DeltaTime);
 	void TickMonitoringPanel(float DeltaTime);
 
+	void ResetMonitorPanel();
+
 	void ResetGraph(FGraph_Mc_Lf& Graph);
 	void InitGraph(FGraph_Mc_Lf& Graph, const int32 NumPoints, const int32 NumLines, const TObjectPtr<UCanvasPanel> CanvasPanel) const;
 

@@ -6,7 +6,7 @@ ATcpClient_Mc_Lf::ATcpClient_Mc_Lf()
 {
 	// Set this actor to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickInterval = 0.1f;
+	PrimaryActorTick.TickInterval = 0.05f;
 }
 
 void ATcpClient_Mc_Lf::BeginPlay()
@@ -40,7 +40,7 @@ void ATcpClient_Mc_Lf::Tick(float DeltaTime)
 		return;
 	}
 
-	LastTcpSocketData = FString("");
+	// LastTcpSocketData = FString("");
 	//bIsConnected = false;
 	TcpSockets.SetNum(ADataTranslate_Mc_Lf::IPAddresses.Num());
 	int32 IpIdx = 0;
@@ -234,7 +234,13 @@ FString ATcpClient_Mc_Lf::ReceiveData_Mc(FSocket* Socket)
 
 			if (ReceivedData.Num() > 0)
 			{
-				return FString(UTF8_TO_TCHAR(ReceivedData.GetData()));
+				TArray<FString> SeparatorArray;
+				FString(UTF8_TO_TCHAR(ReceivedData.GetData())).ParseIntoArray(SeparatorArray, TEXT("!"), false);
+				if (SeparatorArray.Num())
+				{
+					return SeparatorArray[0];
+				}
+				return FString("");
 			}
 		}
 	}
@@ -247,9 +253,6 @@ void ATcpClient_Mc_Lf::CloseSocket(FSocket* Socket)
 	{
 		//TcpSocket->Shutdown(ESocketShutdownMode::ReadWrite);
 		Socket->Close();
-
-		//ISocketSubsystem& Sockets = *(ISocketSubsystem::Get());
-		//Sockets.DestroySocket(TcpSocket);
 	}
 
 	Socket = nullptr;
