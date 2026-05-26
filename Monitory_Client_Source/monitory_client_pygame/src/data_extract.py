@@ -23,13 +23,33 @@ export_stats_json =	{"Time_Now": "",
 			"Gpu_Temperature": 0}
 			
 def translate_data(raw_string):
+
+    base_data = raw_string.split('!')
+    data = base_data[0].split('|')
+    
+    # Test the data
+    data_valid = False
+    for item in data:
+        slices = item.split(":")
+        if len(slices) != 5:
+            continue
+            
+        label = slices[0]
+        sub_label = slices[1]  
+            
+        if "Cpu_Utility" in label:
+            data_valid = True
+            break
+        
+    # This check prevents the missing pieces in the graph
+    # because the send data is slower as the app FPS
+    if not data_valid:
+        return
+        
     export_stats_json["Cpu_Utility_Thread"] = []
     export_stats_json["Cpu_Clock_Thread"] = []
     export_stats_json["Storage_Load"] = dict()
-
-    base_data = raw_string.split('!')
     
-    data = base_data[0].split('|')
     for item in data:
         slices = item.split(":")
         if len(slices) != 5:

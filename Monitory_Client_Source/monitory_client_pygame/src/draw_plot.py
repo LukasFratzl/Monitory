@@ -143,12 +143,13 @@ class Graph:
                         average_value /= 2
                     except:
                         continue
-            a_x = (w * self.screen_p_x) - ((self.num_slices_x + 2) * (w * self.grid_p))
-            a_y = (h * self.screen_p_y) - (average_value * (h * self.size_p_y))
+            if average_value > 0:
+                a_x = (w * self.screen_p_x) - ((self.num_slices_x + 2) * (w * self.grid_p))
+                a_y = (h * self.screen_p_y) - (average_value * (h * self.size_p_y))
             
-            a_pre_x = (w * self.screen_p_x) - ((-2) * (w * self.grid_p))
-            # a_pre_y = (h * self.screen_p_y) - (self.data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
-            pygame.draw.line(screen, app_theme_slice.graph_average_line_color, (a_pre_x, a_y), (a_x, a_y), 2)
+                a_pre_x = (w * self.screen_p_x) - ((-2) * (w * self.grid_p))
+                # a_pre_y = (h * self.screen_p_y) - (self.data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
+                pygame.draw.line(screen, app_theme_slice.graph_average_line_color, (a_pre_x, a_y), (a_x, a_y), 2)
         
         # Draw bottom line
         if app_theme_slice.graph_bottom_line_color[3] > 0: # If we have alpha
