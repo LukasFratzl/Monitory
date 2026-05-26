@@ -11,13 +11,12 @@ pygame.init()
 white_color = (255,255,255)
 black_color = (0, 0, 0)
 
+# CREATING CANVAS
+canvas = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
 def fullscreen():
     native_display_size = pygame.display.get_desktop_sizes()
     canvas = pygame.display.set_mode(native_display_size[0], pygame.RESIZABLE)
     pygame.display.toggle_fullscreen()
-
-# CREATING CANVAS
-canvas = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
 # Comment out for fullscreen
 # fullscreen()
 
