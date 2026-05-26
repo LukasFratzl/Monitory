@@ -11,9 +11,15 @@ pygame.init()
 white_color = (255,255,255)
 black_color = (0, 0, 0)
 
+def fullscreen():
+    native_display_size = pygame.display.get_desktop_sizes()
+    canvas = pygame.display.set_mode(native_display_size[0], pygame.RESIZABLE)
+    pygame.display.toggle_fullscreen()
+
 # CREATING CANVAS
-canvas = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
-# DISPLAYSURF = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+canvas = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
+# Comment out for fullscreen
+# fullscreen()
 
 # TITLE OF CANVAS
 pygame.display.set_caption("Monitory Client")
@@ -45,7 +51,7 @@ while not exit:
     ms = int(1.0 / float(FPS) * 1000.0)
     pygame.time.wait(ms)
     # time.sleep(0.2)
-    
+
 # At this point something crashed or we exit
 # End networking thread
 stop_tcp_client()

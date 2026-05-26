@@ -25,9 +25,19 @@ class DarkTheme(AppTheme):
         self.color_pink = (248, 12, 255, 255)
         self.color_purple_half = (182, 155, 255, 100)
         
+        self.time_slice = AppThemeSlice()
+        self.time_slice.font_color = self.color_green
+        self.time_slice.font_bg_color = self.none
+        # Thats the line between tima and date
+        self.time_slice.graph_bottom_line_color = self.color_pink 
+        
+        self.date_slice = AppThemeSlice()
+        self.date_slice.font_color = self.color_green
+        self.date_slice.font_bg_color = self.none
+        
         self.cpu_slice = AppThemeSlice()
         self.cpu_slice.font_color = self.color_green
-        self.cpu_slice.font_bg_color = self.color_blue
+        self.cpu_slice.font_bg_color = self.none
         self.cpu_slice.graph_average_line_color = self.color_pink
         self.cpu_slice.graph_bottom_line_color = self.color_transparent
         self.cpu_slice.graph_bg_color = self.color_blue_half
@@ -35,7 +45,7 @@ class DarkTheme(AppTheme):
     
         self.dram_slice = AppThemeSlice()
         self.dram_slice.font_color = self.color_green
-        self.dram_slice.font_bg_color = self.color_blue
+        self.dram_slice.font_bg_color = self.none
         self.dram_slice.graph_average_line_color = self.color_transparent
         self.dram_slice.graph_bottom_line_color = self.color_transparent
         self.dram_slice.graph_bg_color = self.color_blue
@@ -43,7 +53,7 @@ class DarkTheme(AppTheme):
         
         self.disk_slice = AppThemeSlice()
         self.disk_slice.font_color = self.color_green
-        self.disk_slice.font_bg_color = self.color_blue
+        self.disk_slice.font_bg_color = self.none
         self.disk_slice.graph_average_line_color = self.color_transparent
         self.disk_slice.graph_bottom_line_color = self.color_transparent 
         self.disk_slice.graph_bg_color = self.color_blue
@@ -51,7 +61,7 @@ class DarkTheme(AppTheme):
         
         self.gpu_slice = AppThemeSlice()
         self.gpu_slice.font_color = self.color_green
-        self.gpu_slice.font_bg_color = self.color_blue
+        self.gpu_slice.font_bg_color = self.none
         self.gpu_slice.graph_average_line_color = self.color_transparent
         self.gpu_slice.graph_bottom_line_color = self.color_transparent 
         self.gpu_slice.graph_bg_color = self.color_blue
@@ -59,7 +69,7 @@ class DarkTheme(AppTheme):
         
         self.vram_slice = AppThemeSlice()
         self.vram_slice.font_color = self.color_green
-        self.vram_slice.font_bg_color = self.color_blue
+        self.vram_slice.font_bg_color = self.none
         self.vram_slice.graph_average_line_color = self.color_transparent
         self.vram_slice.graph_bottom_line_color = self.color_transparent 
         self.vram_slice.graph_bg_color = self.color_blue
@@ -67,7 +77,7 @@ class DarkTheme(AppTheme):
         
         self.net_slice = AppThemeSlice()
         self.net_slice.font_color = self.color_green
-        self.net_slice.font_bg_color = self.color_blue
+        self.net_slice.font_bg_color = self.none
         self.net_slice.graph_average_line_color = self.color_transparent
         self.net_slice.graph_bottom_line_color = self.color_transparent 
         self.net_slice.graph_bg_color = self.color_transparent
@@ -82,6 +92,16 @@ class LightTheme(DarkTheme):
         self.color_dark_gray_half = (40, 47, 51, 100)
         self.color_blue_gray = (185, 202, 221, 255)
         self.color_blue_gray_half = (185, 202, 221, 100)
+        
+        self.time_slice = AppThemeSlice()
+        self.time_slice.font_color = self.color_dark_gray
+        self.time_slice.font_bg_color = self.none
+        # Thats the line between tima and date
+        self.time_slice.graph_bottom_line_color = self.color_dark_gray
+        
+        self.date_slice = AppThemeSlice()
+        self.date_slice.font_color = self.color_dark_gray
+        self.date_slice.font_bg_color = self.none
         
         self.cpu_slice = AppThemeSlice()
         self.cpu_slice.font_color = self.color_dark_gray
@@ -146,6 +166,20 @@ class Theme:
             return self.dark_theme.screen_color
         else:
             return self.light_theme.screen_color
+            
+    def get_time_slice(self):
+        # Some theme logic
+        if self.is_dark_theme():
+            return self.dark_theme.time_slice
+        else:
+            return self.light_theme.time_slice
+            
+    def get_date_slice(self):
+        # Some theme logic
+        if self.is_dark_theme():
+            return self.dark_theme.date_slice
+        else:
+            return self.light_theme.date_slice
     
     def get_cpu_slice(self):
         # Some theme logic

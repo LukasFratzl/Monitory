@@ -19,11 +19,13 @@ class AppWindow:
         # self.color_green = (0, 255, 0, 255)
         # self.color_blue = (0, 0, 128, 255)
         # self.color_blue_half = (0, 0, 128, 100)
-        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', 22)
+        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', 32)
         
         self.grid_p = 0.005
         
         self.theme = Theme()
+        self.time_slice = self.theme.get_time_slice()
+        self.date_slice = self.theme.get_date_slice()
         self.cpu_slice = self.theme.get_cpu_slice()
         self.vram_slice = self.theme.get_vram_slice()
         self.disk_slice = self.theme.get_disk_slice()
@@ -32,12 +34,12 @@ class AppWindow:
         self.net_slice = self.theme.get_net_slice()
         
         # 1st ROW
-        self.cpu_plot = Plot(screen_p_x=0.33, screen_p_y=0.45, \
+        self.cpu_plot = Plot(screen_p_x=0.32, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='CPU', \
                                 app_theme_slice=self.cpu_slice, \
                                 label_font=self.default_font, grid_p=self.grid_p)
                                 
-        self.cpu_ram_plot = Plot(screen_p_x=0.66, screen_p_y=0.45, \
+        self.cpu_ram_plot = Plot(screen_p_x=0.65, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='DRAM', \
                                 app_theme_slice=self.vram_slice, \
                                 label_font=self.default_font, grid_p=self.grid_p)
@@ -48,12 +50,12 @@ class AppWindow:
                                 label_font=self.default_font, grid_p=self.grid_p)
         
         # 2nd ROW
-        self.gpu_util_plot = Plot(screen_p_x=0.33, screen_p_y=0.7, \
+        self.gpu_util_plot = Plot(screen_p_x=0.32, screen_p_y=0.7, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='GPU', \
                                 app_theme_slice=self.gpu_slice, \
                                 label_font=self.default_font, grid_p=self.grid_p)
         
-        self.gpu_ram_plot = Plot(screen_p_x=0.66, screen_p_y=0.7, \
+        self.gpu_ram_plot = Plot(screen_p_x=0.65, screen_p_y=0.7, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='VRAM', \
                                 app_theme_slice=self.vram_slice, \
                                 label_font=self.default_font, grid_p=self.grid_p)
@@ -66,6 +68,9 @@ class AppWindow:
     def draw_window(self, screen):
         # background
         screen.fill(self.theme.get_screen_color())
+        
+        # Time, Date
+        self.draw_time(screen, self.time_slice, self.date_slice)
         
         # COU Util
         cpu_util = export_stats_json["Cpu_Utility_Thread"]
@@ -159,3 +164,30 @@ class AppWindow:
         self.net_plot.update_val("↑ {:.1f}Mbps  ".format(net_up / 100000), "↓ {:.1f}Mbps".format(net_down / 100000), \
                                 app_theme_slice=self.net_slice, \
                                 label_font=self.default_font)
+                                
+    
+    def draw_time(self, screen, time_slice, date_slice):
+        time = export_stats_json["Time_Now"]
+        date = export_stats_json["Date_Now"]
+        
+        w, h = pygame.display.get_surface().get_size()
+        
+        time_label = self.default_font.render(time, True, time_slice.font_color, time_slice.font_bg_color)
+        time_label_rect = time_label.get_rect()
+        origin_x = w * 0.15
+        t_y = h * 0.091
+        # time_label_rect.update((t_x, t_y), time_label_rect.size)
+        time_label_rect = time_label.get_rect(bottomleft = (origin_x, t_y - 1))
+        screen.blit(time_label,  time_label_rect)
+        
+        l_y = h * 0.0925
+        l_x = w * 0.135
+        le_x = origin_x + 300
+        pygame.draw.line(screen, time_slice.graph_bottom_line_color, (l_x, l_y), (le_x, l_y), 1)
+        
+        date_label = self.default_font.render(date, True, date_slice.font_color, date_slice.font_bg_color)
+        date_label_rect = date_label.get_rect()
+        d_y = h * 0.10
+        # date_label_rect.update((d_x, d_y), date_label_rect.size)
+        date_label_rect = date_label.get_rect(topleft = (origin_x, d_y - 1))
+        screen.blit(date_label,  date_label_rect)
