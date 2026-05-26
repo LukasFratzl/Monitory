@@ -170,6 +170,7 @@ class Plot:
         self.percentage_value = -1.0
         self.graph_value = -1.0
         self.hw_name = hw_name
+        self.label_font = label_font
         self.stats_name = ""
         
         self.main_graph = Graph(screen_p_x=screen_p_x, screen_p_y=screen_p_y, \
@@ -182,6 +183,9 @@ class Plot:
         self.stats_label_rect = self.stats_label_text.get_rect()
         
     def update_val(self, perc_val, value, app_theme_slice, label_font):
+        # just in case there its switching theme
+        self.hw_label_text = self.label_font.render(self.hw_name, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+        
         self.percentage_value = perc_val
         self.graph_value = value
         

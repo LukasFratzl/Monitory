@@ -66,6 +66,16 @@ class AppWindow:
                                 label_font=self.default_font, grid_p=self.grid_p)
 
     def draw_window(self, screen):
+        # Lets get the latest theme data in case of an theme switch
+        self.time_slice = self.theme.get_time_slice()
+        self.date_slice = self.theme.get_date_slice()
+        self.cpu_slice = self.theme.get_cpu_slice()
+        self.vram_slice = self.theme.get_vram_slice()
+        self.disk_slice = self.theme.get_disk_slice()
+        self.gpu_slice = self.theme.get_gpu_slice()
+        self.vram_slice = self.theme.get_vram_slice()
+        self.net_slice = self.theme.get_net_slice()
+    
         # background
         screen.fill(self.theme.get_screen_color())
         

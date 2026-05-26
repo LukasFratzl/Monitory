@@ -1,3 +1,5 @@
+import time
+from src.io import read_data
 
 class AppThemeSlice:
     def __init__(self):
@@ -156,9 +158,19 @@ class Theme:
     def __init__(self):
         self.dark_theme = DarkTheme()
         self.light_theme = LightTheme()
+        self.start_timer = time.time()
+        self._is_dark_theme = True
+        self._theme_init = False
     
     def is_dark_theme(self):
-        return True
+        end = time.time()
+        length = end - self.start_timer
+        if length > 15.0 or not self._theme_init:
+            self._theme_init = True
+            self.start_timer = time.time()
+            data = read_data()
+            self._is_dark_theme = data["dark_mode"]
+        return self._is_dark_theme
     
     def get_screen_color(self):
         # Some theme logic
