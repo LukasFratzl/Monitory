@@ -1,7 +1,8 @@
 import json
 
 save_data_archtyoe = {
-    "dark_mode": True, 
+    "dark_mode": True,
+    "font_size": 45,
     "IPs": []
 }
 

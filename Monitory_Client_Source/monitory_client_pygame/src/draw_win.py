@@ -5,6 +5,7 @@ import random
 from src.draw_plot import Plot
 from src.data_extract import export_stats_json
 from src.theme import *
+from src.io import read_data
 
 class AppWindow:
     def __init__(self):
@@ -19,7 +20,9 @@ class AppWindow:
         # self.color_green = (0, 255, 0, 255)
         # self.color_blue = (0, 0, 128, 255)
         # self.color_blue_half = (0, 0, 128, 100)
-        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', 45)
+        saved_data = read_data()
+        font_size = saved_data["font_size"]
+        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Bold.ttf', font_size)
         
         self.grid_p = 0.005
         
