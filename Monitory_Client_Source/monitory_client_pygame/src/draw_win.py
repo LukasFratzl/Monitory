@@ -22,7 +22,7 @@ class AppWindow:
         # self.color_blue_half = (0, 0, 128, 100)
         saved_data = read_data()
         font_size = saved_data["font_size"]
-        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Bold.ttf', font_size)
+        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', font_size)
         
         self.grid_p = 0.005
         
