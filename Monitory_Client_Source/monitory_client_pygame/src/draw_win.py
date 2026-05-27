@@ -19,7 +19,7 @@ class AppWindow:
         # self.color_green = (0, 255, 0, 255)
         # self.color_blue = (0, 0, 128, 255)
         # self.color_blue_half = (0, 0, 128, 100)
-        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', 52)
+        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', 45)
         
         self.grid_p = 0.005
         
