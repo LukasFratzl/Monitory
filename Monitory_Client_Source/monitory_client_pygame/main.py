@@ -3,6 +3,7 @@ import pygame
 
 from src.draw_win import *
 from src.tcp import *
+from src.frame_dirty import *
 
 FPS = 10
 
@@ -18,13 +19,14 @@ def fullscreen():
     canvas = pygame.display.set_mode(native_display_size[0], pygame.RESIZABLE)
     pygame.display.toggle_fullscreen()
 # Comment out for fullscreen
-# fullscreen()
+fullscreen()
 
 # TITLE OF CANVAS
 pygame.display.set_caption("Monitory Client")
 
 # image = pygame.image.load("assets/Screenshot.png")
 exit = False
+frame_dirty = True
 
 app_window = AppWindow()
 
@@ -42,7 +44,9 @@ while not exit:
         if event.type == pygame.QUIT:
             exit = True
 
-    app_window.draw_window(canvas)
+    if get_frame_dirty():
+        set_frame_dirty(False)
+        app_window.draw_window(canvas)
     
     pygame.display.update()
     
