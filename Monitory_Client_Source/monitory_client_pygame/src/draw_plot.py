@@ -16,6 +16,7 @@ class Graph:
         self.grid_p = grid_p
         self.data_slice = [[]]
         self.data_slice_runtime = [[]]
+        self.final_data_slice = [[]]
         self.average_data_runtime = []
         
         if self.screen_p_x < self.size_p_x:
@@ -24,7 +25,7 @@ class Graph:
             print("Make sure screen_p_y is >= than size_p_y to fit it into the screen")
     
     
-    def build(self, current_data, screen, app_theme_slice):
+    def build(self, current_data, screen, app_theme_slice, has_relative_data):
         # if len(self.data_slice) > 0 and len(current_data) != len(self.data_slice[-1]):
         #     print(f"current graph has different size ... " + \
         #             f"new: {len(current_data)}, current: {len(self.data_slice[-1])}")
@@ -50,13 +51,42 @@ class Graph:
         # Add new data to the first element
         self.data_slice[0] = current_data
         
+        if has_relative_data:
+            self.final_data_slice = [ [ float for y in range( len(current_data) ) ] for x in range( self.num_slices_x ) ]
+            
+            # lets average the grap to the highest max
+            # find highest value
+            max_val = 0
+            num_slices = len(self.data_slice)
+            for i, x in enumerate(self.data_slice, start=0):
+                for y in x:
+                    try:
+                        x1 = float(y)
+                    except:
+                        continue
+                    if y > max_val:
+                        max_val = y
+            # average it
+            for i, y in enumerate(self.data_slice, start=0):
+                for j in range(len(y)):
+                    try:
+                        x1 = float(y[j] / max_val)
+                    except:
+                        continue
+                    # divide it with the max value to geth it in 0..1 format, and half the values for a better graph view
+                    self.final_data_slice[i][j] = (y[j] / max_val) * 0.5
+                
+            # self.final_data_slice = cached_percentages.copy()
+        else:
+            self.final_data_slice = self.data_slice
+        
         # Starting from top left point of the screen
         w, h = pygame.display.get_surface().get_size()
         
         # Draw the plot
         idx_x = 0
         previous_best_val = 0.0
-        for elem_x in self.data_slice:
+        for elem_x in self.final_data_slice:
             # Function is calling the previous point to draw a line, idx 0 has no prev.
             if idx_x == 0:
                 idx_x += 1
@@ -76,14 +106,14 @@ class Graph:
                 try:
                     # When the array is fresh we don't need to draw zeros
                     x1 = float(elem_y)
-                    x0 = float(self.data_slice[idx_x - 1][idx_y])
+                    x0 = float(self.final_data_slice[idx_x - 1][idx_y])
                 except:
                     continue
                 x = (w * self.screen_p_x) - (idx_x * (w * self.grid_p))
                 y = (h * self.screen_p_y) - (elem_y * (h * self.size_p_y))
                 
                 pre_x = (w * self.screen_p_x) - ((idx_x - 1) * (w * self.grid_p))
-                pre_y = (h * self.screen_p_y) - (self.data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
+                pre_y = (h * self.screen_p_y) - (self.final_data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
                 
                 # x is more to the right of screen x than pre_x
                 # se we use pre_x with zero y to have the 1st point from the polygon
@@ -116,7 +146,7 @@ class Graph:
                 y = (h * self.screen_p_y) - (elem_y * (h * self.size_p_y))
                 
                 pre_x = (w * self.screen_p_x) - ((idx_x - 1) * (w * self.grid_p))
-                pre_y = (h * self.screen_p_y) - (self.data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
+                pre_y = (h * self.screen_p_y) - (self.final_data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
                 
                 if app_theme_slice.graph_line_color[3] < 255:
                     wanted_color = get_color_safe(idx_y, app_theme_slice.line_color_offset, 255)
@@ -148,7 +178,7 @@ class Graph:
                 a_y = (h * self.screen_p_y) - (average_value * (h * self.size_p_y))
             
                 a_pre_x = (w * self.screen_p_x) - ((-2) * (w * self.grid_p))
-                # a_pre_y = (h * self.screen_p_y) - (self.data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
+                # a_pre_y = (h * self.screen_p_y) - (self.final_data_slice[idx_x - 1][idx_y] * (h * self.size_p_y))
                 pygame.draw.line(screen, app_theme_slice.graph_average_line_color, (a_pre_x, a_y), (a_x, a_y), 2)
         
         # Draw bottom line
@@ -196,8 +226,8 @@ class Plot:
         self.stats_label_rect = self.stats_label_text.get_rect()
         
                                 
-    def build(self, screen, graph_data, app_theme_slice):
-        self.main_graph.build(graph_data, screen, app_theme_slice)
+    def build(self, screen, graph_data, app_theme_slice, has_relative_data):
+        self.main_graph.build(graph_data, screen, app_theme_slice, has_relative_data)
         
         self.move_text(screen)
         

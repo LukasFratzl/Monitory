@@ -85,7 +85,7 @@ class AppWindow:
         # COU Util
         cpu_util = export_stats_json["Cpu_Utility_Thread"]
                         
-        self.cpu_plot.build(screen, cpu_util, app_theme_slice=self.cpu_slice)
+        self.cpu_plot.build(screen, cpu_util, app_theme_slice=self.cpu_slice, has_relative_data=False)
         
         cpu_perc = export_stats_json["Cpu_Utility_Total"] * 100.0
         cpu_ghz = export_stats_json["Cpu_Clock_Average"] / 1024
@@ -104,7 +104,7 @@ class AppWindow:
             cpu_dram_per.append(float(cpu_dram_used) / float(cpu_dram_available))
             
         
-        self.cpu_ram_plot.build(screen, cpu_dram_per, app_theme_slice=self.vram_slice)
+        self.cpu_ram_plot.build(screen, cpu_dram_per, app_theme_slice=self.vram_slice, has_relative_data=False)
         
         self.cpu_ram_plot.update_val(" {:.1f}%".format(cpu_dram_per[0] * 100), " {:.1f}GB".format(cpu_dram_used), \
                                 app_theme_slice=self.vram_slice, \
@@ -119,7 +119,7 @@ class AppWindow:
             if x_01 > max_load:
                 max_load = x_01
         
-        self.drives_plot.build(screen, storage, app_theme_slice=self.disk_slice)
+        self.drives_plot.build(screen, storage, app_theme_slice=self.disk_slice, has_relative_data=False)
         
         self.drives_plot.update_val(" {:.1f}%".format(max_load * 100), "", \
                                 app_theme_slice=self.disk_slice, \
@@ -128,7 +128,7 @@ class AppWindow:
         # GPU Util
         gpu_util = [export_stats_json["Gpu_Utility"]]
         gpu_ghz = export_stats_json["Gpu_Clock"]
-        self.gpu_util_plot.build(screen, gpu_util, app_theme_slice=self.gpu_slice)
+        self.gpu_util_plot.build(screen, gpu_util, app_theme_slice=self.gpu_slice, has_relative_data=False)
         
         self.gpu_util_plot.update_val(" {:.1f}%".format(gpu_util[0] * 100), " {:.1f}GHz".format(gpu_ghz / 1024), \
                                 app_theme_slice=self.gpu_slice, \
@@ -144,7 +144,7 @@ class AppWindow:
             gpu_vram_per = []
             gpu_vram_per.append(float(gpu_mem_used) / float(gpu_mem_available + gpu_mem_used))
             
-        self.gpu_ram_plot.build(screen, gpu_vram_per, app_theme_slice=self.vram_slice)
+        self.gpu_ram_plot.build(screen, gpu_vram_per, app_theme_slice=self.vram_slice, has_relative_data=False)
         
         self.gpu_ram_plot.update_val(" {:.1f}%".format(gpu_vram_per[0] * 100), " {:.1f}GB".format(gpu_mem_used), \
                                 app_theme_slice=self.vram_slice, \
@@ -152,25 +152,11 @@ class AppWindow:
         
         # Net
         net_up = export_stats_json["Net_Upload_Speed"]
-        if net_up <= 0:
-            net_up = 1.0
         net_down = export_stats_json["Net_Download_Speed"]
-        if net_down <= 0:
-            net_down = 1.0
         
-        net_max = max(net_up, net_down)
-        if net_max <= 0:
-            net_max = 1.0
-        net_up_p = net_up / net_max
-        net_down_p = net_down / net_max
+        net_traffic = [net_down, net_up]
         
-        # The lines should stay in the middle of the graph
-        net_up_p *= 0.5
-        net_down_p *= 0.5
-        
-        net_traffic = [net_down_p, net_up_p]
-        
-        self.net_plot.build(screen, net_traffic, app_theme_slice=self.net_slice)
+        self.net_plot.build(screen, net_traffic, app_theme_slice=self.net_slice, has_relative_data=True)
         self.net_plot.update_val("↑ {:.1f}Mbps  ".format(net_up / 100000), "↓ {:.1f}Mbps".format(net_down / 100000), \
                                 app_theme_slice=self.net_slice, \
                                 label_font=self.default_font)
