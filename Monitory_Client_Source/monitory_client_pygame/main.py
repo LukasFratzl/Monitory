@@ -19,7 +19,9 @@ def fullscreen():
     canvas = pygame.display.set_mode(native_display_size[0], pygame.RESIZABLE)
     pygame.display.toggle_fullscreen()
 # Comment out for fullscreen
-fullscreen()
+save_data = read_data()
+if save_data["fullscreen"]:
+    fullscreen()
 
 # TITLE OF CANVAS
 pygame.display.set_caption("Monitory Client")
