@@ -190,16 +190,17 @@ class AppWindow:
         
         (max_value, max_val_combined) = self.wattage_plot.build(screen, watt_values, app_theme_slice=self.watt_slice,\
                                                                 has_relative_data=True)
-        self.wattage_plot.update_val("{:.0f}  W".format(max_w), "   ", \
-                                app_theme_slice=self.watt_slice, \
-                                label_font=self.default_font)
-                                
-        self.wattage_plot.update_max_val(screen, app_theme_slice=self.watt_slice,\
-                                        screen_p_x=0.32, screen_p_y=0.75, \
-                                        max_value_str="{:.0f}  MAX".format(max_val_combined))
-        self.wattage_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.watt_slice,\
-                                            screen_p_x=0.32, screen_p_y=0.85,\
-                                            items=export_stats_json["Wattage"], value_format="{:.0f}")
+        if max_value > 0.0:
+            self.wattage_plot.update_val("{:.0f}  W".format(max_w), "   ", \
+                                    app_theme_slice=self.watt_slice, \
+                                    label_font=self.default_font)
+                                    
+            self.wattage_plot.update_max_val(screen, app_theme_slice=self.watt_slice,\
+                                            screen_p_x=0.32, screen_p_y=0.75, \
+                                            max_value_str="{:.0f}  MAX".format(max_val_combined))
+            self.wattage_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.watt_slice,\
+                                                screen_p_x=0.32, screen_p_y=0.85,\
+                                                items=export_stats_json["Wattage"], value_format="{:.0f}")
                                 
         # TEMP                
         max_t = 0
@@ -211,17 +212,18 @@ class AppWindow:
         
         (max_value, max_val_combined) = self.temp_plot.build(screen, temp_values, app_theme_slice=self.temp_slice,\
                                                             has_relative_data=True)
-        self.temp_plot.update_val("{:.1f}  C".format(max_t), "   ", \
-                                app_theme_slice=self.temp_slice, \
-                                label_font=self.default_font)
-                                
-        self.temp_plot.update_max_val(screen, app_theme_slice=self.temp_slice,\
-                                        screen_p_x=0.82, screen_p_y=0.75, \
-                                        max_value_str="{:.1f}  MAX".format(max_value))
+        if max_value > 0.0:
+            self.temp_plot.update_val("{:.1f}  C".format(max_t), "   ", \
+                                    app_theme_slice=self.temp_slice, \
+                                    label_font=self.default_font)
                                     
-        self.temp_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.temp_slice,\
-                                            screen_p_x=0.82, screen_p_y=0.85,\
-                                            items=export_stats_json["Temperature"], value_format="{:.0f}")
+            self.temp_plot.update_max_val(screen, app_theme_slice=self.temp_slice,\
+                                            screen_p_x=0.82, screen_p_y=0.75, \
+                                            max_value_str="{:.1f}  MAX".format(max_value))
+                                        
+            self.temp_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.temp_slice,\
+                                                screen_p_x=0.82, screen_p_y=0.85,\
+                                                items=export_stats_json["Temperature"], value_format="{:.0f}")
                                 
     
     def draw_time(self, screen, time_slice, date_slice):
