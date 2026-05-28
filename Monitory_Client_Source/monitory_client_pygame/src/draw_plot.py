@@ -29,8 +29,8 @@ class Graph:
         # if len(self.data_slice) > 0 and len(current_data) != len(self.data_slice[-1]):
         #     print(f"current graph has different size ... " + \
         #             f"new: {len(current_data)}, current: {len(self.data_slice[-1])}")
-        if len(current_data) == 0:
-            return (0.0, 0.0)
+        # if len(current_data) == 0:
+        #     return (0.0, 0.0)
         
         self.num_slices_x = int(math.floor(self.size_p_x / self.grid_p))
         if len(self.data_slice) != self.num_slices_x:
