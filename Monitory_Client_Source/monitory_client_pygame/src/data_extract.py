@@ -8,13 +8,18 @@ export_stats_json =	{"Time_Now": "",
 			"Date_Now": "",
 			"Cpu_Utility_Total": 0,
 			"Cpu_Utility_Thread": [],
+			"Cpu_Utility_Thread_fallback": [],
 			"Cpu_Clock_Average": 0,
 			"Cpu_Clock_Thread": [],
+			"Cpu_Clock_Thread_fallback": [],
 			"Wattage": {},
+			"Wattage_fallback": {},
 			"Temperature": {},
+			"Temperature_fallback": {},
 			"Cpu_Memory_Available": 0,
 			"Cpu_Memory_Used": 0,
 			"Storage_Load": {},
+			"Storage_Load_fallback": {},
 			"Net_Upload_Speed": 0,
 			"Net_Download_Speed": 0,
 			"Gpu_Utility": 0,
@@ -131,4 +136,27 @@ def translate_data(raw_string):
             if "Available" in sub_label:
                 export_stats_json["Gpu_Memory_Available"] = current_val
             
-            
+    if len(export_stats_json["Cpu_Utility_Thread"]) < 1:
+        export_stats_json["Cpu_Utility_Thread"] = export_stats_json["Cpu_Utility_Thread_fallback"].copy()
+    else:
+        export_stats_json["Cpu_Utility_Thread_fallback"] = export_stats_json["Cpu_Utility_Thread"].copy()
+        
+    if len(export_stats_json["Cpu_Clock_Thread"]) < 1:
+        export_stats_json["Cpu_Clock_Thread"] = export_stats_json["Cpu_Clock_Thread_fallback"].copy()
+    else:
+        export_stats_json["Cpu_Clock_Thread_fallback"] = export_stats_json["Cpu_Clock_Thread"].copy()
+        
+    if len(export_stats_json["Storage_Load"]) < 1:
+        export_stats_json["Storage_Load"] = export_stats_json["Storage_Load_fallback"].copy()
+    else:
+        export_stats_json["Storage_Load_fallback"] = export_stats_json["Storage_Load"].copy()
+        
+    if len(export_stats_json["Wattage"]) < 1:
+        export_stats_json["Wattage"] = export_stats_json["Wattage_fallback"].copy()
+    else:
+        export_stats_json["Wattage_fallback"] = export_stats_json["Wattage"].copy()
+        
+    if len(export_stats_json["Temperature"]) < 1:
+        export_stats_json["Temperature"] = export_stats_json["Temperature_fallback"].copy()
+    else:
+        export_stats_json["Temperature_fallback"] = export_stats_json["Temperature"].copy()

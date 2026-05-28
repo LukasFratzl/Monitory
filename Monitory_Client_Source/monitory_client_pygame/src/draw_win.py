@@ -38,11 +38,6 @@ class AppWindow:
         self.watt_slice = self.theme.get_watt_slice()
         self.temp_slice = self.theme.get_temp_slice()
         
-        # dicts need a fallback to now blink
-        self.drive_fallback = dict()
-        self.wattage_fallback = dict()
-        self.temp_fallback = dict()
-        
         # 1st ROW
         self.cpu_plot = Plot(screen_p_x=0.32, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='CPU', \
@@ -136,14 +131,9 @@ class AppWindow:
                                 label_font=self.default_font)
         
         # Storage Load
-        if len(export_stats_json["Storage_Load"]) == 0:
-            drive_value = self.drive_fallback.copy()
-        else:
-            drive_value = export_stats_json["Storage_Load"].copy()
-            self.drive_fallback = export_stats_json["Storage_Load"].copy()
         storage = []
         max_load = 0
-        for x in drive_value.values():
+        for x in export_stats_json["Storage_Load"].values():
             x_01 = x * 0.01
             storage.append(x_01)
             if x_01 > max_load:
@@ -192,14 +182,9 @@ class AppWindow:
                                 label_font=self.default_font)
         
         # WATT
-        if len(export_stats_json["Wattage"]) == 0:
-            wattage_value = self.wattage_fallback.copy()
-        else:
-            wattage_value = export_stats_json["Wattage"].copy()
-            self.wattage_fallback = export_stats_json["Wattage"].copy()
         max_w = 0
         watt_values = []
-        for w in wattage_value.values():
+        for w in export_stats_json["Wattage"].values():
             watt_values.append(w)
             max_w += w
         
@@ -217,12 +202,7 @@ class AppWindow:
                                                 screen_p_x=0.32, screen_p_y=0.85,\
                                                 items=export_stats_json["Wattage"], value_format="{:.0f}")
                                 
-        # TEMP
-        if len(export_stats_json["Temperature"]) == 0:
-            temp_value = self.temp_fallback.copy()
-        else:
-            temp_value = export_stats_json["Temperature"].copy()
-            self.temp_fallback = export_stats_json["Temperature"].copy()
+        # TEMP                
         max_t = 0
         temp_values = []
         for t in export_stats_json["Temperature"].values():
