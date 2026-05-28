@@ -99,7 +99,7 @@ class AppWindow:
         
         cpu_perc = export_stats_json["Cpu_Utility_Total"] * 100.0
         cpu_ghz = export_stats_json["Cpu_Clock_Average"] / 1024
-        self.cpu_plot.update_val(" {:.1f} %".format(cpu_perc), " <- {:.2f} GHz".format(cpu_ghz), \
+        self.cpu_plot.update_val(" {:.1f} %".format(cpu_perc), " || {:.2f} GHz".format(cpu_ghz), \
                                 app_theme_slice=self.cpu_slice, \
                                 label_font=self.default_font)
         
@@ -116,7 +116,7 @@ class AppWindow:
         
         self.cpu_ram_plot.build(screen, cpu_dram_per, app_theme_slice=self.vram_slice, has_relative_data=False)
         
-        self.cpu_ram_plot.update_val(" {:.1f} %".format(cpu_dram_per[0] * 100), " <- {:.1f} GB".format(cpu_dram_used), \
+        self.cpu_ram_plot.update_val(" {:.1f} %".format(cpu_dram_per[0] * 100), " || {:.1f} GB".format(cpu_dram_used), \
                                 app_theme_slice=self.vram_slice, \
                                 label_font=self.default_font)
         
@@ -140,7 +140,7 @@ class AppWindow:
         gpu_ghz = export_stats_json["Gpu_Clock"]
         self.gpu_util_plot.build(screen, gpu_util, app_theme_slice=self.gpu_slice, has_relative_data=False)
         
-        self.gpu_util_plot.update_val(" {:.1f} %".format(gpu_util[0] * 100), " <- {:.2f} GHz".format(gpu_ghz / 1024), \
+        self.gpu_util_plot.update_val(" {:.1f} %".format(gpu_util[0] * 100), " || {:.2f} GHz".format(gpu_ghz / 1024), \
                                 app_theme_slice=self.gpu_slice, \
                                 label_font=self.default_font)
                                 
@@ -156,7 +156,7 @@ class AppWindow:
             
         self.gpu_ram_plot.build(screen, gpu_vram_per, app_theme_slice=self.vram_slice, has_relative_data=False)
         
-        self.gpu_ram_plot.update_val(" {:.1f} %".format(gpu_vram_per[0] * 100), " <- {:.1f} GB".format(gpu_mem_used), \
+        self.gpu_ram_plot.update_val(" {:.1f} %".format(gpu_vram_per[0] * 100), " || {:.1f} GB".format(gpu_mem_used), \
                                 app_theme_slice=self.vram_slice, \
                                 label_font=self.default_font)
         
