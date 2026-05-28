@@ -76,10 +76,10 @@ class Graph:
                 for j in range(len(y)):
                     try:
                         x1 = float(y[j] / max_val)
+                        # divide it with the max value to geth it in 0..1 format, and half the values for a better graph view
+                        self.final_data_slice[i][j] = (y[j] / max_val) * 0.5
                     except:
                         continue
-                    # divide it with the max value to geth it in 0..1 format, and half the values for a better graph view
-                    self.final_data_slice[i][j] = (y[j] / max_val) * 0.5
                 
             # self.final_data_slice = cached_percentages.copy()
         else:
