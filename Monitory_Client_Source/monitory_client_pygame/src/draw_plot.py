@@ -26,12 +26,6 @@ class Graph:
     
     
     def build(self, current_data, screen, app_theme_slice, has_relative_data):
-        # if len(self.data_slice) > 0 and len(current_data) != len(self.data_slice[-1]):
-        #     print(f"current graph has different size ... " + \
-        #             f"new: {len(current_data)}, current: {len(self.data_slice[-1])}")
-        # if len(current_data) == 0:
-        #     return (0.0, 0.0)
-        
         self.num_slices_x = int(math.floor(self.size_p_x / self.grid_p))
         if len(self.data_slice) != self.num_slices_x:
             print(f"init graph slices ... " + \
@@ -254,7 +248,6 @@ class Plot:
         st_y = (h * self.screen_p_y) - (h * self.size_p_y)
         st_x = (w * self.screen_p_x)
         self.stats_label_rect = self.stats_label_text.get_rect(topright = (st_x + 1, st_y - 1))
-        # self.stats_label_rect.update((st_x, st_y), self.stats_label_rect.size)
         screen.blit(self.stats_label_text,  self.stats_label_rect)
         
     def update_max_val(self, screen, app_theme_slice, screen_p_x, screen_p_y, max_value_str):
@@ -265,7 +258,6 @@ class Plot:
         
         v_x = w * screen_p_x
         v_y = h * screen_p_y
-        # date_label_rect.update((d_x, d_y), date_label_rect.size)
         self.max_val_rect = self.max_val_text.get_rect(topleft = (v_x, v_y - 1))
         screen.blit(self.max_val_text,  self.max_val_rect)
         

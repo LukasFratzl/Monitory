@@ -40,9 +40,6 @@ def tcp_client(server, port):
             time.sleep(3)
 
 def start_tcp_client(server, port=54000):
-    # server = "127.0.0.1"  # Replace with your server IP
-    # port = 8080           # Replace with your server port
-    
     global TCP_EXIT
     TCP_EXIT = False;
 

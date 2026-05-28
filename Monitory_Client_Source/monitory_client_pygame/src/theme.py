@@ -59,7 +59,7 @@ class DarkTheme(AppTheme):
         self.disk_slice.graph_average_line_color = self.color_transparent
         self.disk_slice.graph_bottom_line_color = self.color_transparent 
         self.disk_slice.graph_bg_color = self.color_blue
-        self.disk_slice.graph_line_color = self.color_green
+        self.disk_slice.graph_line_color = self.color_transparent
         
         self.gpu_slice = AppThemeSlice()
         self.gpu_slice.font_color = self.color_green
