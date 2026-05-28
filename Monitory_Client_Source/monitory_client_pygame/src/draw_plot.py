@@ -51,21 +51,26 @@ class Graph:
         # Add new data to the first element
         self.data_slice[0] = current_data
         
+        # lets average the grap to the highest max
+        # find highest value
+        max_val = 0
+        max_val_combined = 0
+        num_slices = len(self.data_slice)
+        for i, x in enumerate(self.data_slice, start=0):
+            m_val = 0
+            for y in x:
+                try:
+                    x1 = float(y)
+                except:
+                    continue
+                if y > max_val:
+                    max_val = y
+                m_val += y
+            if m_val > max_val_combined:
+                max_val_combined = m_val
+        
         if has_relative_data:
             self.final_data_slice = [ [ float for y in range( len(current_data) ) ] for x in range( self.num_slices_x ) ]
-            
-            # lets average the grap to the highest max
-            # find highest value
-            max_val = 0
-            num_slices = len(self.data_slice)
-            for i, x in enumerate(self.data_slice, start=0):
-                for y in x:
-                    try:
-                        x1 = float(y)
-                    except:
-                        continue
-                    if y > max_val:
-                        max_val = y
             # average it
             for i, y in enumerate(self.data_slice, start=0):
                 for j in range(len(y)):
@@ -189,6 +194,8 @@ class Graph:
             a_pre_x = (w * self.screen_p_x) - (w * self.grid_p)
             pygame.draw.line(screen, app_theme_slice.graph_bottom_line_color, (a_pre_x, a_y), (a_x, a_y))
             
+        return (max_val, max_val_combined)
+            
 class Plot:
     def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, hw_name, app_theme_slice, label_font, grid_p=0.005):
         self.screen_p_x = screen_p_x
@@ -227,9 +234,11 @@ class Plot:
         
                                 
     def build(self, screen, graph_data, app_theme_slice, has_relative_data):
-        self.main_graph.build(graph_data, screen, app_theme_slice, has_relative_data)
+        (max_value, max_val_combined) = self.main_graph.build(graph_data, screen, app_theme_slice, has_relative_data)
         
         self.move_text(screen)
+        
+        return (max_value, max_val_combined)
         
     def move_text(self, screen):
         # Starting from top left point of the screen
@@ -246,4 +255,36 @@ class Plot:
         # self.stats_label_rect.update((st_x, st_y), self.stats_label_rect.size)
         screen.blit(self.stats_label_text,  self.stats_label_rect)
         
-    
+    def update_max_val(self, screen, app_theme_slice, screen_p_x, screen_p_y, max_value_str):
+        self.max_val_text = self.label_font.render(max_value_str, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+        # self.max_val_rect = self.max_val_text.get_rect()
+        
+        w, h = pygame.display.get_surface().get_size()
+        
+        v_x = w * screen_p_x
+        v_y = h * screen_p_y
+        # date_label_rect.update((d_x, d_y), date_label_rect.size)
+        self.max_val_rect = self.max_val_text.get_rect(topleft = (v_x, v_y - 1))
+        screen.blit(self.max_val_text,  self.max_val_rect)
+        
+    def draw_legend_items(self, screen, label_font, app_theme_slice, screen_p_x, screen_p_y, items, value_format):
+        w, h = pygame.display.get_surface().get_size()
+        idx = 0
+        for key, val in items.items():
+            x = w * screen_p_x
+            y = (h * screen_p_y) + idx * 60
+            
+            val_text = label_font.render(value_format.format(val), True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+            val_rect = val_text.get_rect(topright = (x, y - 1))
+            screen.blit(val_text,  val_rect)
+            
+            x += 10
+            wanted_color = get_color_safe(idx, app_theme_slice.line_color_offset, 255)
+            [pygame.draw.rect(screen, c, (x, y, 50, 25), w) for c, w in [(wanted_color, 0), (app_theme_slice.font_color, 5)]]
+            
+            x += 60
+            label_text = label_font.render(f"{key}", True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+            label_rect = label_text.get_rect(topleft = (x, y - 1))
+            screen.blit(label_text,  label_rect)
+            
+            idx += 1

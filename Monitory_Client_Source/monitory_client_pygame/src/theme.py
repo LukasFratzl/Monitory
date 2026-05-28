@@ -86,6 +86,23 @@ class DarkTheme(AppTheme):
         self.net_slice.graph_line_color = self.color_transparent
         self.net_slice.line_color_offset = 27
         
+        self.watt_slice = AppThemeSlice()
+        self.watt_slice.font_color = self.color_green
+        self.watt_slice.font_bg_color = self.none
+        self.watt_slice.graph_average_line_color = self.color_transparent
+        self.watt_slice.graph_bottom_line_color = self.color_transparent 
+        self.watt_slice.graph_bg_color = self.color_transparent
+        self.watt_slice.graph_line_color = self.color_transparent
+        
+        self.temp_slice = AppThemeSlice()
+        self.temp_slice.font_color = self.color_green
+        self.temp_slice.font_bg_color = self.none
+        self.temp_slice.graph_average_line_color = self.color_transparent
+        self.temp_slice.graph_bottom_line_color = self.color_transparent 
+        self.temp_slice.graph_bg_color = self.color_transparent
+        self.temp_slice.graph_line_color = self.color_transparent
+        
+        
 class LightTheme(DarkTheme):
     def __init__(self):
         super().__init__()
@@ -153,6 +170,22 @@ class LightTheme(DarkTheme):
         self.net_slice.graph_bg_color = self.color_transparent
         self.net_slice.graph_line_color = self.color_transparent
         self.net_slice.line_color_offset = 27
+        
+        self.watt_slice = AppThemeSlice()
+        self.watt_slice.font_color = self.color_dark_gray
+        self.watt_slice.font_bg_color = self.none
+        self.watt_slice.graph_average_line_color = self.color_transparent
+        self.watt_slice.graph_bottom_line_color = self.color_transparent 
+        self.watt_slice.graph_bg_color = self.color_purple_half
+        self.watt_slice.graph_line_color = self.color_green
+        
+        self.temp_slice = AppThemeSlice()
+        self.temp_slice.font_color = self.color_dark_gray
+        self.temp_slice.font_bg_color = self.none
+        self.temp_slice.graph_average_line_color = self.color_transparent
+        self.temp_slice.graph_bottom_line_color = self.color_transparent 
+        self.temp_slice.graph_bg_color = self.color_purple_half
+        self.temp_slice.graph_line_color = self.color_green
         
 class Theme:
     def __init__(self):
@@ -234,3 +267,17 @@ class Theme:
             return self.dark_theme.net_slice
         else:
             return self.light_theme.net_slice
+            
+    def get_watt_slice(self):
+        # Some theme logic
+        if self.is_dark_theme():
+            return self.dark_theme.watt_slice
+        else:
+            return self.light_theme.watt_slice
+            
+    def get_temp_slice(self):
+        # Some theme logic
+        if self.is_dark_theme():
+            return self.dark_theme.temp_slice
+        else:
+            return self.light_theme.temp_slice

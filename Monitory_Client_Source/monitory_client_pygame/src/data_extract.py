@@ -10,8 +10,8 @@ export_stats_json =	{"Time_Now": "",
 			"Cpu_Utility_Thread": [],
 			"Cpu_Clock_Average": 0,
 			"Cpu_Clock_Thread": [],
-			"Cpu_Wattage": 0,
-			"Cpu_Temperature": 0,
+			"Wattage": {},
+			"Temperature": {},
 			"Cpu_Memory_Available": 0,
 			"Cpu_Memory_Used": 0,
 			"Storage_Load": {},
@@ -20,9 +20,7 @@ export_stats_json =	{"Time_Now": "",
 			"Gpu_Utility": 0,
 			"Gpu_Clock": 0,
 			"Gpu_Memory_Available": 0,
-			"Gpu_Memory_Used": 0,
-			"Gpu_Wattage": 0,
-			"Gpu_Temperature": 0}
+			"Gpu_Memory_Used": 0}
 			
 def translate_data(raw_string):
 
@@ -53,6 +51,8 @@ def translate_data(raw_string):
     export_stats_json["Cpu_Utility_Thread"] = []
     export_stats_json["Cpu_Clock_Thread"] = []
     export_stats_json["Storage_Load"] = dict()
+    export_stats_json["Wattage"] = dict()
+    export_stats_json["Temperature"] = dict()
     
     for item in data:
         slices = item.split(":")
@@ -99,16 +99,10 @@ def translate_data(raw_string):
                 export_stats_json["Cpu_Clock_Thread"].append(current_val)
                 
         if "Wattage" in label:
-            if "Compute Unit" in sub_label:
-                export_stats_json["Cpu_Wattage"] = current_val
-            if "Graphics" in sub_label:
-                export_stats_json["Gpu_Wattage"] = current_val
+            export_stats_json["Wattage"][sub_label] = current_val
                 
         if "Temperature" in label:
-            if "Compute Unit" in sub_label:
-                export_stats_json["Cpu_Temperature"] = current_val
-            if "Graphics" in sub_label:
-                export_stats_json["Gpu_Temperature"] = current_val
+            export_stats_json["Temperature"][sub_label] = current_val
                 
         if "Cpu_Memory" in label:
             if "Used" in sub_label:
