@@ -25,7 +25,7 @@ class Graph:
             print("Make sure screen_p_y is >= than size_p_y to fit it into the screen")
     
     
-    def build(self, current_data, screen, app_theme_slice, has_relative_data):
+    def build(self, current_data, screen, app_theme_slice, has_relative_data, average_value_override):
         self.num_slices_x = int(math.floor(self.size_p_x / self.grid_p))
         if len(self.data_slice) != self.num_slices_x:
             print(f"init graph slices ... " + \
@@ -164,16 +164,19 @@ class Graph:
         
         # Darw average line
         if app_theme_slice.graph_average_line_color[3] > 0: # If we have alpha
-            average_value = -1.0
-            for elem in current_data:
-                if average_value < -0.5:
-                    average_value = elem
-                else:
-                    try:
-                        average_value += elem
-                        average_value /= 2
-                    except:
-                        continue
+            if average_value_override < 0.0:
+                average_value = -1.0
+                for elem in current_data:
+                    if average_value < -0.5:
+                        average_value = elem
+                    else:
+                        try:
+                            average_value += elem
+                            average_value /= 2
+                        except:
+                            continue
+            else:
+                average_value = average_value_override
             if average_value > 0:
                 a_x = (w * self.screen_p_x) - ((self.num_slices_x + 2) * (w * self.grid_p))
                 a_y = (h * self.screen_p_y) - (average_value * (h * self.size_p_y))
@@ -229,8 +232,9 @@ class Plot:
         self.stats_label_rect = self.stats_label_text.get_rect()
         
                                 
-    def build(self, screen, graph_data, app_theme_slice, has_relative_data):
-        (max_value, max_val_combined) = self.main_graph.build(graph_data, screen, app_theme_slice, has_relative_data)
+    def build(self, screen, graph_data, app_theme_slice, has_relative_data, average_value_override):
+        (max_value, max_val_combined) = self.main_graph.build(graph_data, screen, app_theme_slice, \
+                                                                has_relative_data, average_value_override)
         
         self.move_text(screen)
         
