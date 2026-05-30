@@ -9,7 +9,7 @@ FPS = 10
 
 pygame.init()
 
-canvas = pygame.display.set_mode((1920, 1080), pygame.RESIZABLE)
+canvas = pygame.display.set_mode((2100, 1100), pygame.RESIZABLE)
 def fullscreen():
     native_display_size = pygame.display.get_desktop_sizes()
     canvas = pygame.display.set_mode(native_display_size[0], pygame.RESIZABLE)

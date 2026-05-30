@@ -196,7 +196,7 @@ class Graph:
         return (max_val, max_val_combined)
             
 class Plot:
-    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, hw_name, app_theme_slice, label_font, grid_p=0.005):
+    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, hw_name, app_theme_slice, grid_p=0.005):
         self.screen_p_x = screen_p_x
         self.screen_p_y = screen_p_y
         self.size_p_x = size_p_x
@@ -206,30 +206,41 @@ class Plot:
         self.percentage_value = -1.0
         self.graph_value = -1.0
         self.hw_name = hw_name
-        self.label_font = label_font
         self.stats_name = ""
         
         self.main_graph = Graph(screen_p_x=screen_p_x, screen_p_y=screen_p_y, \
                                 size_p_x=size_p_x, size_p_y=size_p_y, grid_p=self.grid_p)
         
-        self.hw_label_text = label_font.render(hw_name, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+        self.hw_label_text = app_theme_slice.label_font.render(hw_name, True, app_theme_slice.font_color,\
+                                                                    app_theme_slice.font_bg_color)
         self.hw_label_rect = self.hw_label_text.get_rect()
         
-        self.stats_label_text = label_font.render(self.stats_name, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
-        self.stats_label_rect = self.stats_label_text.get_rect()
+        self.perc_label_text = app_theme_slice.stats_0_font.render(self.stats_name, True, app_theme_slice.perc_font_color,\
+                                                                        app_theme_slice.perc_font_bg_color)
+        self.perc_label_rect = self.perc_label_text.get_rect()
         
-    def update_val(self, perc_val, value, app_theme_slice, label_font):
+        self.stat_label_text = app_theme_slice.stats_1_font.render(self.stats_name, True, app_theme_slice.stat_font_color,\
+                                                                        app_theme_slice.stat_font_bg_color)
+        self.stat_label_rect = self.stat_label_text.get_rect()
+        
+    def update_val(self, value, perc_val, app_theme_slice):
         # just in case there its switching theme
-        self.hw_label_text = self.label_font.render(self.hw_name, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+        self.hw_label_text = app_theme_slice.label_font.render(self.hw_name, True, app_theme_slice.font_color,\
+                                                                    app_theme_slice.font_bg_color)
         
         self.percentage_value = perc_val
         self.graph_value = value
         
         # Assuming they are strings
-        wanted_txt = self.stats_name + perc_val + value;
+        # wanted_txt = self.stats_name + value + perc_val;
             
-        self.stats_label_text = label_font.render(wanted_txt, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
-        self.stats_label_rect = self.stats_label_text.get_rect()
+        self.perc_label_text = app_theme_slice.stats_0_font.render(perc_val, True, app_theme_slice.perc_font_color,\
+                                                                                app_theme_slice.perc_font_bg_color)
+        self.perc_label_rect = self.perc_label_text.get_rect()
+        
+        self.stat_label_text = app_theme_slice.stats_1_font.render(value, True, app_theme_slice.stat_font_color,\
+                                                                                app_theme_slice.stat_font_bg_color)
+        self.stat_label_rect = self.stat_label_text.get_rect()
         
                                 
     def build(self, screen, graph_data, app_theme_slice, has_relative_data, average_value_override):
@@ -249,13 +260,19 @@ class Plot:
         self.hw_label_rect.update((hw_x, hw_y), self.hw_label_rect.size)
         screen.blit(self.hw_label_text,  self.hw_label_rect)
         
+        pr_y = (h * self.screen_p_y) - (h * self.size_p_y)
+        pr_x = (w * self.screen_p_x)
+        self.perc_label_rect = self.perc_label_text.get_rect(topright = (pr_x + 1, pr_y - 1))
+        screen.blit(self.perc_label_text,  self.perc_label_rect)
+        
         st_y = (h * self.screen_p_y) - (h * self.size_p_y)
-        st_x = (w * self.screen_p_x)
-        self.stats_label_rect = self.stats_label_text.get_rect(topright = (st_x + 1, st_y - 1))
-        screen.blit(self.stats_label_text,  self.stats_label_rect)
+        st_x = (w * self.screen_p_x) - (w * self.size_p_x * 0.5)
+        self.stat_label_rect = self.stat_label_text.get_rect(midtop = (st_x + 1, st_y - 1))
+        screen.blit(self.stat_label_text,  self.stat_label_rect)
         
     def update_max_val(self, screen, app_theme_slice, screen_p_x, screen_p_y, max_value_str):
-        self.max_val_text = self.label_font.render(max_value_str, True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+        self.max_val_text = app_theme_slice.stats_0_font.render(max_value_str, True, app_theme_slice.perc_font_color,\
+                                                                            app_theme_slice.perc_font_bg_color)
         # self.max_val_rect = self.max_val_text.get_rect()
         
         w, h = pygame.display.get_surface().get_size()
@@ -265,23 +282,26 @@ class Plot:
         self.max_val_rect = self.max_val_text.get_rect(topleft = (v_x, v_y - 1))
         screen.blit(self.max_val_text,  self.max_val_rect)
         
-    def draw_legend_items(self, screen, label_font, app_theme_slice, screen_p_x, screen_p_y, items, value_format):
+    def draw_legend_items(self, screen, app_theme_slice, screen_p_x, screen_p_y, items, value_format):
         w, h = pygame.display.get_surface().get_size()
         idx = 0
         for key, val in items.items():
             x = w * screen_p_x
             y = (h * screen_p_y) + idx * 60
             
-            val_text = label_font.render(value_format.format(val), True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+            val_text = app_theme_slice.label_legent_items_font.render(value_format.format(val), True, app_theme_slice.stat_font_color,\
+                                                                        app_theme_slice.stat_font_bg_color)
             val_rect = val_text.get_rect(topright = (x, y - 1))
             screen.blit(val_text,  val_rect)
             
             x += 10
             wanted_color = get_color_safe(idx, app_theme_slice.line_color_offset, 255)
-            [pygame.draw.rect(screen, c, (x, y, 50, 25), w) for c, w in [(wanted_color, 0), (app_theme_slice.font_color, 5)]]
+            # change 2nd value for border... 
+            [pygame.draw.rect(screen, c, (x, y, 50, 25), w) for c, w in [(wanted_color, 0), (wanted_color, 5)]]
             
             x += 60
-            label_text = label_font.render(f"{key}", True, app_theme_slice.font_color, app_theme_slice.font_bg_color)
+            label_text = app_theme_slice.label_legent_items_font.render(f"{key}", True, app_theme_slice.stat_font_color,\
+                                                                        app_theme_slice.stat_font_bg_color)
             label_rect = label_text.get_rect(topleft = (x, y - 1))
             screen.blit(label_text,  label_rect)
             

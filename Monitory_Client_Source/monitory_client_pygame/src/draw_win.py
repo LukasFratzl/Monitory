@@ -9,10 +9,6 @@ from src.io import read_data
 
 class AppWindow:
     def __init__(self):
-    
-        saved_data = read_data()
-        self.font_size = saved_data["font_size"]
-        self.default_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', self.font_size)
         
         self.grid_p = 0.005
         
@@ -32,44 +28,44 @@ class AppWindow:
         self.cpu_plot = Plot(screen_p_x=0.32, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='CPU', \
                                 app_theme_slice=self.cpu_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
                                 
         self.cpu_ram_plot = Plot(screen_p_x=0.65, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='DRAM', \
                                 app_theme_slice=self.vram_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
                                 
         self.drives_plot = Plot(screen_p_x=0.98, screen_p_y=0.45, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='DISK', \
                                 app_theme_slice=self.disk_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
         
         # 2nd ROW
         self.gpu_util_plot = Plot(screen_p_x=0.32, screen_p_y=0.7, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='GPU', \
                                 app_theme_slice=self.gpu_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
         
         self.gpu_ram_plot = Plot(screen_p_x=0.65, screen_p_y=0.7, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='VRAM', \
                                 app_theme_slice=self.vram_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
                                 
         self.net_plot = Plot(screen_p_x=0.98, screen_p_y=0.7, \
-                                size_p_x=0.30, size_p_y=0.2, hw_name='NET (Mbps)', \
+                                size_p_x=0.30, size_p_y=0.2, hw_name='NET', \
                                 app_theme_slice=self.net_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
                                 
         # 3rd ROW
         self.wattage_plot = Plot(screen_p_x=0.27, screen_p_y=0.95, \
                                 size_p_x=0.25, size_p_y=0.2, hw_name='WATT', \
                                 app_theme_slice=self.gpu_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
                                 
         self.temp_plot = Plot(screen_p_x=0.79, screen_p_y=0.95, \
                                 size_p_x=0.25, size_p_y=0.2, hw_name='TEMP', \
                                 app_theme_slice=self.gpu_slice, \
-                                label_font=self.default_font, grid_p=self.grid_p)
+                                grid_p=self.grid_p)
 
     def draw_window(self, screen):
         # Lets get the latest theme data in case of an theme switch
@@ -84,7 +80,7 @@ class AppWindow:
         self.watt_slice = self.theme.get_watt_slice()
         self.temp_slice = self.theme.get_temp_slice()
         
-        self.legent_label_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', int(self.font_size * 0.5))
+        # self.legent_label_font = pygame.font.Font('assets/ttf/FiraCode-Light.ttf', int(self.font_size * 0.5))
     
         # background
         screen.fill(self.theme.get_screen_color())
@@ -100,9 +96,8 @@ class AppWindow:
         
         cpu_perc = export_stats_json["Cpu_Utility_Total"] * 100.0
         cpu_ghz = export_stats_json["Cpu_Clock_Average"] / 1024
-        self.cpu_plot.update_val(" {:.1f} %".format(cpu_perc), " || {:.2f} GHz".format(cpu_ghz), \
-                                app_theme_slice=self.cpu_slice, \
-                                label_font=self.default_font)
+        self.cpu_plot.update_val("{:.2f} GHz".format(cpu_ghz), "  {:.1f} %".format(cpu_perc), \
+                                app_theme_slice=self.cpu_slice)
         
         # Cpu dram
         cpu_dram_available = export_stats_json["Cpu_Memory_Available"]
@@ -118,9 +113,8 @@ class AppWindow:
         self.cpu_ram_plot.build(screen, cpu_dram_per, app_theme_slice=self.vram_slice, has_relative_data=False,\
                                 average_value_override=-1.0)
         
-        self.cpu_ram_plot.update_val(" {:.1f} %".format(cpu_dram_per[0] * 100), " || {:.1f} GB".format(cpu_dram_used), \
-                                app_theme_slice=self.vram_slice, \
-                                label_font=self.default_font)
+        self.cpu_ram_plot.update_val("{:.1f} GB".format(cpu_dram_used), "  {:.1f} %".format(cpu_dram_per[0] * 100), \
+                                app_theme_slice=self.vram_slice)
         
         # Storage Load
         storage = []
@@ -134,9 +128,8 @@ class AppWindow:
         self.drives_plot.build(screen, storage, app_theme_slice=self.disk_slice, has_relative_data=False,\
                                 average_value_override=-1.0)
         
-        self.drives_plot.update_val(" {:.1f} %".format(max_load * 100), "", \
-                                app_theme_slice=self.disk_slice, \
-                                label_font=self.default_font)
+        self.drives_plot.update_val("", "{:.1f} %".format(max_load * 100), \
+                                app_theme_slice=self.disk_slice)
                                 
         # GPU Util
         gpu_util = [export_stats_json["Gpu_Utility"]]
@@ -144,9 +137,8 @@ class AppWindow:
         self.gpu_util_plot.build(screen, gpu_util, app_theme_slice=self.gpu_slice, has_relative_data=False,\
                                 average_value_override=-1.0)
         
-        self.gpu_util_plot.update_val(" {:.1f} %".format(gpu_util[0] * 100), " || {:.2f} GHz".format(gpu_ghz / 1024), \
-                                app_theme_slice=self.gpu_slice, \
-                                label_font=self.default_font)
+        self.gpu_util_plot.update_val("{:.2f} GHz".format(gpu_ghz / 1024), "  {:.1f} %".format(gpu_util[0] * 100), \
+                                app_theme_slice=self.gpu_slice)
                                 
         # GPU RAM
         gpu_mem_available = export_stats_json["Gpu_Memory_Available"]
@@ -161,9 +153,8 @@ class AppWindow:
         self.gpu_ram_plot.build(screen, gpu_vram_per, app_theme_slice=self.vram_slice, has_relative_data=False,\
                                 average_value_override=-1.0)
         
-        self.gpu_ram_plot.update_val(" {:.1f} %".format(gpu_vram_per[0] * 100), " || {:.1f} GB".format(gpu_mem_used), \
-                                app_theme_slice=self.vram_slice, \
-                                label_font=self.default_font)
+        self.gpu_ram_plot.update_val("{:.1f} GB".format(gpu_mem_used), "  {:.1f} %".format(gpu_vram_per[0] * 100), \
+                                app_theme_slice=self.vram_slice)
         
         # Net
         net_up = export_stats_json["Net_Upload_Speed"]
@@ -173,9 +164,8 @@ class AppWindow:
         
         self.net_plot.build(screen, net_traffic, app_theme_slice=self.net_slice, has_relative_data=True,\
                             average_value_override=-1.0)
-        self.net_plot.update_val("↑ {:.0f} ".format(net_up / 100000), "|| ↓ {:.0f}".format(net_down / 100000), \
-                                app_theme_slice=self.net_slice, \
-                                label_font=self.default_font)
+        self.net_plot.update_val("   ↑ {:.1f} ".format(net_up / 100000), " ↓ {:.1f}".format(net_down / 100000), \
+                                app_theme_slice=self.net_slice)
         
         # WATT
         max_w = 0
@@ -188,13 +178,12 @@ class AppWindow:
                                                                 has_relative_data=True, average_value_override=-1.0)
         if max_value > 0.0:
             self.wattage_plot.update_val("{:.0f} W".format(max_w), "   ", \
-                                    app_theme_slice=self.watt_slice, \
-                                    label_font=self.default_font)
+                                    app_theme_slice=self.watt_slice)
                                     
             self.wattage_plot.update_max_val(screen, app_theme_slice=self.watt_slice,\
                                             screen_p_x=0.32, screen_p_y=0.75, \
                                             max_value_str="{:.0f} W MAX".format(max_val_combined))
-            self.wattage_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.watt_slice,\
+            self.wattage_plot.draw_legend_items(screen, app_theme_slice=self.watt_slice,\
                                                 screen_p_x=0.32, screen_p_y=0.85,\
                                                 items=export_stats_json["Wattage"], value_format="{:.0f}")
                                 
@@ -210,14 +199,13 @@ class AppWindow:
                                                             has_relative_data=True, average_value_override=-1.0)
         if max_value > 0.0:
             self.temp_plot.update_val("{:.1f} C".format(max_t), "   ", \
-                                    app_theme_slice=self.temp_slice, \
-                                    label_font=self.default_font)
+                                    app_theme_slice=self.temp_slice)
                                     
             self.temp_plot.update_max_val(screen, app_theme_slice=self.temp_slice,\
                                             screen_p_x=0.82, screen_p_y=0.75, \
                                             max_value_str="{:.1f} C MAX".format(max_value))
                                         
-            self.temp_plot.draw_legend_items(screen, self.legent_label_font, app_theme_slice=self.temp_slice,\
+            self.temp_plot.draw_legend_items(screen, app_theme_slice=self.temp_slice,\
                                                 screen_p_x=0.82, screen_p_y=0.85,\
                                                 items=export_stats_json["Temperature"], value_format="{:.0f}")
                                 
@@ -228,7 +216,7 @@ class AppWindow:
         
         w, h = pygame.display.get_surface().get_size()
         
-        time_label = self.default_font.render(time, True, time_slice.font_color, time_slice.font_bg_color)
+        time_label = time_slice.label_font.render(time, True, time_slice.font_color, time_slice.font_bg_color)
         time_label_rect = time_label.get_rect()
         origin_x = w * 0.15
         t_y = h * 0.091
@@ -240,7 +228,7 @@ class AppWindow:
         le_x = origin_x + 300
         pygame.draw.line(screen, time_slice.graph_bottom_line_color, (l_x, l_y), (le_x, l_y), 1)
         
-        date_label = self.default_font.render(date, True, date_slice.font_color, date_slice.font_bg_color)
+        date_label = date_slice.label_font.render(date, True, date_slice.font_color, date_slice.font_bg_color)
         date_label_rect = date_label.get_rect()
         d_y = h * 0.10
         date_label_rect = date_label.get_rect(topleft = (origin_x, d_y - 1))
