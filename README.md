@@ -1,6 +1,6 @@
 # Monitory
 
-*_Monitory is a Cross-Platform Monitoring App which allows to Monitor a Linux or Windows Device through a Android Phone or Tablet_*
+*_Monitory is a Cross-Platform Monitoring App which allows to Monitor a Linux or Windows Device over the network with a nice gui on the client device*
 
 ## Server:
 *_Monitory Server Apps are available for Windows and Linux, this apps reading the hardware and sending it via TCP to the Clients_*
@@ -16,20 +16,22 @@
  - Run it and when you like it add it as start up application
 
 ## Client:
-*_Monitory Client Apps are available for Linux, (Android support getting removed in future), get a Linux Tablet..., this apps reading the TCP Data sended from the Monitory Server App to display the Hardware Infos on this Client Device_*
- ![Client App](Docs/Monitory_Client_1.gif)
-#### Android:
- - Navigate to the Releases and download an Android Client version
- - Install it on your Android Device, it needs to be 64 Bit, Android 8 or Higher, ES3.1 or Higher
- - Run it and Play with the customization settings
- - White List the Server IP, you can have multiple Servers and it should connect with the Server
+*_Monitory Client Apps are available for all devices which can run Python 3.11, this apps reading the TCP Data sended from the Monitory Server App to display the Hardware Infos on this Client Device_*
+ ![Client App](Docs/Monitory_Client_2_light.gif)
+![Client App](Docs/Monitory_Client_2_dark.gif)
 
-#### Linux:
-- Navigate to the Releases and download an Linux Client version
-- Linux builts are currently just x64, 64 bit arch
-- Run it and Play with the customization settings
-- White List the Server IP, you can have multiple Servers and it should connect with the Server
+#### Client Install:
+- Navigate to the Releases and download the project source
+- `cd "./Monitory/Monitory_Client_Source/monitory_client_pygame/"`
+- `python3 -m venv .venv`
+- Activate the env, on linux `source .venv/bin/activate` , on windows `.venv/bin/activate`
+- Add the requirements `pip install -r requirements.txt`
+- Run it `python3 main.py`
+
+#### 2nd Run:
+- Activate the env
+- `python3 main.py`
 
 ## Development:
- - Server Applications are written in c# .NET, open the solution and build it
- - Client Application is written in Unreal Engine 5 C++, you need to have UE 5.4.4 Installed, it works with native UE5, you don't need any plugins installed
+ - Server Applications are written in c# .NET (for the Windows server), and with python on the linux server
+ - Client Application is written in python 3.11
