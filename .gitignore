@@ -23,3 +23,5 @@ Monitory_Server_Linux_Source/monitory_server_linux_py/exported_data.json
 Monitory_Client_Source/monitory_client_pygame/src/__pycache__/
 
 Monitory_Client_Source/monitory_client_pygame/__pycache__/
+
+Monitory_Client_Source/monitory_client_pygame/.venv/

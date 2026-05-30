@@ -3,6 +3,7 @@ import json
 save_data_archtyoe = {
     "dark_mode": True,
     "font_size": 45,
+    "buffer_size": 8192, # Increse for more cpu threads
     "fullscreen": True,
     "IPs": []
 }

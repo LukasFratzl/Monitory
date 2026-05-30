@@ -2,6 +2,7 @@ import socket
 import threading
 import time
 from src.data_extract import translate_data
+from src.io import read_data
 
 
 def tcp_client(server, port):
@@ -17,7 +18,7 @@ def tcp_client(server, port):
             # Maintain connection and handle incoming data
             while not TCP_EXIT:  # Keep the connection alive if possible
                 try:
-                    data = sock.recv(4096)
+                    data = sock.recv(TCP_BUFFER_SIZE)
                     if not data:
                         print("Server disconnected")
                         break
@@ -42,6 +43,10 @@ def tcp_client(server, port):
 def start_tcp_client(server, port=54000):
     global TCP_EXIT
     TCP_EXIT = False;
+    
+    save_data = read_data()
+    global TCP_BUFFER_SIZE
+    TCP_BUFFER_SIZE = save_data["buffer_size"]
 
     global client_thread
     client_thread = threading.Thread(target=tcp_client, args=(server, port), daemon=True)
