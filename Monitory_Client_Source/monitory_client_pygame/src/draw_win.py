@@ -107,7 +107,7 @@ class AppWindow:
             cpu_dram_per.append(0)
         else:
             cpu_dram_per = []
-            cpu_dram_per.append(float(cpu_dram_used) / float(cpu_dram_available))
+            cpu_dram_per.append(float(cpu_dram_used) / float(cpu_dram_available + cpu_dram_used))
             
         
         self.cpu_ram_plot.build(screen, cpu_dram_per, app_theme_slice=self.vram_slice, has_relative_data=False,\
