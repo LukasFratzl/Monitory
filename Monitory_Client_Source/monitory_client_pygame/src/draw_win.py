@@ -1,6 +1,7 @@
 import pygame
 import math
 import random
+import time
 
 from src.draw_plot import Plot
 from src.data_extract import export_stats_json
@@ -67,7 +68,7 @@ class AppWindow:
                                 app_theme_slice=self.gpu_slice, \
                                 grid_p=self.grid_p)
 
-    def draw_window(self, screen):
+    def draw_graph_window(self, screen):
         # Lets get the latest theme data in case of an theme switch
         self.time_slice = self.theme.get_time_slice()
         self.date_slice = self.theme.get_date_slice()
@@ -86,7 +87,9 @@ class AppWindow:
         screen.fill(self.theme.get_screen_color())
         
         # Time, Date
-        self.draw_time(screen, self.time_slice, self.date_slice)
+        time_str = export_stats_json["Time_Now"]
+        date_str = export_stats_json["Date_Now"]
+        self.draw_time(screen, self.time_slice, self.date_slice, time_str, date_str)
         
         # COU Util
         cpu_util = export_stats_json["Cpu_Utility_Thread"]
@@ -210,13 +213,10 @@ class AppWindow:
                                                 items=export_stats_json["Temperature"], value_format="{:.0f}")
                                 
     
-    def draw_time(self, screen, time_slice, date_slice):
-        time = export_stats_json["Time_Now"]
-        date = export_stats_json["Date_Now"]
-        
+    def draw_time(self, screen, time_slice, date_slice, time_str, date_str):
         w, h = pygame.display.get_surface().get_size()
         
-        time_label = time_slice.label_font.render(time, True, time_slice.font_color, time_slice.font_bg_color)
+        time_label = time_slice.label_font.render(time_str, True, time_slice.font_color, time_slice.font_bg_color)
         time_label_rect = time_label.get_rect()
         origin_x = w * 0.15
         t_y = h * 0.091
@@ -228,8 +228,25 @@ class AppWindow:
         le_x = origin_x + 300
         pygame.draw.line(screen, time_slice.graph_bottom_line_color, (l_x, l_y), (le_x, l_y), 1)
         
-        date_label = date_slice.label_font.render(date, True, date_slice.font_color, date_slice.font_bg_color)
+        date_label = date_slice.label_font.render(date_str, True, date_slice.font_color, date_slice.font_bg_color)
         date_label_rect = date_label.get_rect()
         d_y = h * 0.10
         date_label_rect = date_label.get_rect(topleft = (origin_x, d_y - 1))
         screen.blit(date_label,  date_label_rect)
+        
+    def draw_main_menu(self, screen):
+        # background
+        screen.fill(self.theme.get_screen_color())
+        
+        # Time
+        time_str = time.strftime("%H:%M", time.localtime())
+        date_str = time.strftime("%d/%m/%Y", time.localtime())
+	    
+        self.draw_time(screen, self.time_slice, self.date_slice, time_str, date_str)
+        
+        # INfo
+        w, h = pygame.display.get_surface().get_size()
+        info_label = self.date_slice.label_font.render("Please add IPs in the ./assets/saved/app_data.json", \
+                                                        True, self.date_slice.font_color, self.date_slice.font_bg_color)
+        info_label_rect = info_label.get_rect(bottomleft = (0, h))
+        screen.blit(info_label,  info_label_rect)

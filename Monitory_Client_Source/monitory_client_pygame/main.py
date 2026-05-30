@@ -1,5 +1,6 @@
 import pygame
 # import time
+import threading
 
 from src.draw_win import *
 from src.tcp import *
@@ -23,8 +24,12 @@ pygame.display.set_caption("Monitory Client")
 exit = False
 
 app_window = AppWindow()
+# Set counter to fake a timeout of the connection to show the main menu
+set_frame_dirty_time(200.0)
+app_window.draw_main_menu(canvas)
 
-tcp_thread = start_tcp_client("192.168.2.84")
+tcp_thread = threading.Thread(target=scan_ips, args=(), daemon=True)
+tcp_thread.start()
     
 
 while not exit:
@@ -34,7 +39,15 @@ while not exit:
 
     if get_frame_dirty():
         set_frame_dirty(False)
-        app_window.draw_window(canvas)
+        app_window.draw_graph_window(canvas)
+    else:
+        previous = get_frame_dirty_time()
+        end = time.time()
+        length = end - previous
+        # We ideling for seconds so we are for sure disconncted
+        # lets draw the main menu
+        if length > 15:
+            app_window.draw_main_menu(canvas)
     
     pygame.display.update()
     
@@ -45,6 +58,8 @@ while not exit:
 
 # At this point something crashed or we exit
 # End networking thread
-stop_tcp_client()
+stop_tcp_clients()
+tcp_thread.join()
+
 pygame.quit()
   
