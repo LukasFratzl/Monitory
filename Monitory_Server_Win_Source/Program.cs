@@ -269,6 +269,7 @@ namespace Monitory_Server_Windows
                         {
                             CollectPowerData(sensor, subhardware.Name, ref watts);
                             CollectTemperatureData(sensor, subhardware.Name, ref temps);
+                            CollectGpuData(sensor, ref properties);
                         }
 
                         if (hardware.HardwareType == HardwareType.Cpu)
@@ -278,7 +279,6 @@ namespace Monitory_Server_Windows
                         }
 
                         CollectMemoryData(sensor, ref properties);
-                        CollectGpuData(sensor, ref properties);
                         if (hardware.HardwareType == HardwareType.Storage)
                         {
                             CollectStorageData(sensor, ref properties);
@@ -294,22 +294,24 @@ namespace Monitory_Server_Windows
 
                 foreach (ISensor sensor in hardware.Sensors)
                 {
-                    if (hardware.HardwareType == HardwareType.Cpu ||
-                        hardware.HardwareType == HardwareType.GpuNvidia ||
+                    if (hardware.HardwareType == HardwareType.GpuNvidia ||
                         hardware.HardwareType == HardwareType.GpuIntel ||
                         hardware.HardwareType == HardwareType.GpuAmd)
                     {
                         CollectPowerData(sensor, hardware.Name, ref watts);
                         CollectTemperatureData(sensor, hardware.Name, ref temps);
+                        CollectGpuData(sensor, ref properties);
                     }
 
                     if (hardware.HardwareType == HardwareType.Cpu)
                     {
+                        CollectPowerData(sensor, hardware.Name, ref watts);
+                        CollectTemperatureData(sensor, hardware.Name, ref temps);
+                        
                         CollectCpuLoadAndClockData(sensor, ref threadLoadIndex, ref threadClockIndex, ref properties);
                     }
 
                     CollectMemoryData(sensor, ref properties);
-                    CollectGpuData(sensor, ref properties);
                     if (hardware.HardwareType == HardwareType.Storage)
                     {
                         CollectStorageData(sensor, ref properties);
