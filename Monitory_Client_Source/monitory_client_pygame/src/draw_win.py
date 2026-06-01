@@ -235,6 +235,10 @@ class AppWindow:
         screen.blit(date_label,  date_label_rect)
         
     def draw_main_menu(self, screen):
+    
+        self.time_slice = self.theme.get_time_slice()
+        self.date_slice = self.theme.get_date_slice()
+        
         # background
         screen.fill(self.theme.get_screen_color())
         
