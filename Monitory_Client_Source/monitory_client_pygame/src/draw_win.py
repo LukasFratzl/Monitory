@@ -98,7 +98,7 @@ class AppWindow:
                             average_value_override=export_stats_json["Cpu_Utility_Total"])
         
         cpu_perc = export_stats_json["Cpu_Utility_Total"] * 100.0
-        cpu_ghz = export_stats_json["Cpu_Clock_Average"] / 1024
+        cpu_ghz = export_stats_json["Cpu_Clock_Average"] / 1000
         self.cpu_plot.update_val("{:.2f} GHz".format(cpu_ghz), "  {:.1f} %".format(cpu_perc), \
                                 app_theme_slice=self.cpu_slice)
         
@@ -140,7 +140,7 @@ class AppWindow:
         self.gpu_util_plot.build(screen, gpu_util, app_theme_slice=self.gpu_slice, has_relative_data=False,\
                                 average_value_override=-1.0)
         
-        self.gpu_util_plot.update_val("{:.2f} GHz".format(gpu_ghz / 1024), "  {:.1f} %".format(gpu_util[0] * 100), \
+        self.gpu_util_plot.update_val("{:.2f} GHz".format(gpu_ghz / 1000), "  {:.1f} %".format(gpu_util[0] * 100), \
                                 app_theme_slice=self.gpu_slice)
                                 
         # GPU RAM
@@ -167,8 +167,9 @@ class AppWindow:
         
         self.net_plot.build(screen, net_traffic, app_theme_slice=self.net_slice, has_relative_data=True,\
                             average_value_override=-1.0)
-        self.net_plot.update_val("   ↑ {:.1f} ".format(net_up / 100000), " ↓ {:.1f}".format(net_down / 100000), \
-                                app_theme_slice=self.net_slice)
+        # https://www.gbmb.org/mbit-to-bytes -> 1 Megabit = (1/8) × 1000000 Bytes -> net_up_bytes * 8 / 1000000
+        self.net_plot.update_val("   ↑ {:.1f} ".format(net_up * 8 / 1000000),\
+                                 " ↓ {:.1f}".format(net_down * 8 / 1000000), app_theme_slice=self.net_slice)
         
         # WATT
         max_w = 0
