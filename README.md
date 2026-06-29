@@ -1,6 +1,6 @@
 # Monitory
 
-*_Monitory is a Cross-Platform Monitoring App which allows to Monitor a Linux or Windows Device over the network with a nice gui on the client device*
+*_Monitory is a Cross-Platform Monitoring App which allows to Monitor a Linux or Windows Device over the network with a nice gui on the client device_*
 
 ## Server:
 *_Monitory Server Apps are available for Windows and Linux, this apps reading the hardware and sending it via TCP to the Clients_*
@@ -24,7 +24,7 @@
 - Navigate to the Releases and download the project source
 - `cd "./Monitory/Monitory_Client_Source/monitory_client_pygame/"`
 - `python3 -m venv .venv`
-- Activate the env, on linux `source .venv/bin/activate` , on windows `.venv/bin/activate`
+- Activate the env, on linux `source .venv/bin/activate` , on windows `.venv/scripts/activate`
 - Add the requirements `pip install -r requirements.txt`
 - Run it `python3 main.py`
 
