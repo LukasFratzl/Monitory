@@ -55,18 +55,18 @@ class AppWindow:
         self.net_plot = Plot(screen_p_x=0.98, screen_p_y=0.7, \
                                 size_p_x=0.30, size_p_y=0.2, hw_name='NET', \
                                 app_theme_slice=self.net_slice, \
-                                grid_p=self.grid_p)
+                                grid_p=self.grid_p, line_width=5)
                                 
         # 3rd ROW
         self.wattage_plot = Plot(screen_p_x=0.27, screen_p_y=0.95, \
                                 size_p_x=0.25, size_p_y=0.2, hw_name='WATT', \
                                 app_theme_slice=self.gpu_slice, \
-                                grid_p=self.grid_p)
+                                grid_p=self.grid_p, line_width=5)
                                 
         self.temp_plot = Plot(screen_p_x=0.79, screen_p_y=0.95, \
                                 size_p_x=0.25, size_p_y=0.2, hw_name='TEMP', \
                                 app_theme_slice=self.gpu_slice, \
-                                grid_p=self.grid_p)
+                                grid_p=self.grid_p, line_width=5)
 
     def draw_graph_window(self, screen):
         # Lets get the latest theme data in case of an theme switch

@@ -4,7 +4,7 @@ import math
 from src.distinct_colors import get_color_safe
 
 class Graph:
-    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, grid_p):
+    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, grid_p, line_width=1):
         # Origin of the plot
         self.screen_p_x = screen_p_x
         self.screen_p_y = screen_p_y
@@ -18,6 +18,8 @@ class Graph:
         self.data_slice_runtime = [[]]
         self.final_data_slice = [[]]
         self.average_data_runtime = []
+        
+        self.line_width = line_width
         
         if self.screen_p_x < self.size_p_x:
             print("Make sure screen_p_x is >= than size_p_x to fit it into the screen")
@@ -154,7 +156,7 @@ class Graph:
                 else:
                     wanted_color = app_theme_slice.graph_line_color
                 
-                pygame.draw.line(screen, wanted_color, (pre_x, pre_y), (x, y))
+                pygame.draw.line(screen, wanted_color, (pre_x, pre_y), (x, y), self.line_width)
                 
                 
                 idx_y += 1
@@ -196,7 +198,7 @@ class Graph:
         return (max_val, max_val_combined)
             
 class Plot:
-    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, hw_name, app_theme_slice, grid_p=0.005):
+    def __init__(self, screen_p_x, screen_p_y, size_p_x, size_p_y, hw_name, app_theme_slice, grid_p=0.005, line_width=1):
         self.screen_p_x = screen_p_x
         self.screen_p_y = screen_p_y
         self.size_p_x = size_p_x
@@ -209,7 +211,7 @@ class Plot:
         self.stats_name = ""
         
         self.main_graph = Graph(screen_p_x=screen_p_x, screen_p_y=screen_p_y, \
-                                size_p_x=size_p_x, size_p_y=size_p_y, grid_p=self.grid_p)
+                                size_p_x=size_p_x, size_p_y=size_p_y, grid_p=self.grid_p, line_width=line_width)
         
         self.hw_label_text = app_theme_slice.label_font.render(hw_name, True, app_theme_slice.font_color,\
                                                                     app_theme_slice.font_bg_color)
